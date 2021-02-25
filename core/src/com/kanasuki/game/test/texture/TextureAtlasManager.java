@@ -17,6 +17,7 @@ public class TextureAtlasManager {
         this.textureAtlasMap = new HashMap<>();
 
         fileNames.put("hero", "animation/hero/spritesheets/hero-sprite.atlas");
+        fileNames.put("enemy", "animation/enemy/spritesheets/enemy-sprite.atlas");
     }
 
     public void dispose() {

@@ -1,10 +1,10 @@
 package com.kanasuki.game.test.actor;
 
-import com.badlogic.gdx.graphics.Texture;
+import com.badlogic.gdx.graphics.g2d.TextureAtlas;
 
-public class Enemy extends GameActor {
+public class Enemy extends AnimatedGameActor {
 
-    public Enemy(Texture texture, int fieldX, int fieldY, int squareSize) {
-        super(texture, fieldX, fieldY, squareSize);
+    public Enemy(TextureAtlas textureAtlas, int fieldX, int fieldY, int squareSize) {
+        super(textureAtlas, fieldX, fieldY, squareSize);
     }
 }

@@ -24,6 +24,9 @@ public class AnimatedGameActor extends Actor {
 
         this.animation = new Animation<>(FRAME_PER_SECOND, textureAtlas.getRegions(), Animation.PlayMode.LOOP);
         this.squareSize = squareSize;
+
+        setX(fieldX * squareSize);
+        setY(fieldY * squareSize);
     }
 
     public boolean isInField(int x, int y) {

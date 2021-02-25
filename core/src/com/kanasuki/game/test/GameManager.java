@@ -2,6 +2,7 @@ package com.kanasuki.game.test;
 
 import com.badlogic.gdx.Gdx;
 import com.badlogic.gdx.graphics.Texture;
+import com.badlogic.gdx.graphics.g2d.TextureAtlas;
 import com.badlogic.gdx.math.MathUtils;
 import com.badlogic.gdx.scenes.scene2d.Actor;
 import com.badlogic.gdx.scenes.scene2d.Group;
@@ -142,7 +143,7 @@ public class GameManager {
         this.winningConditionChecker = new WinningConditionChecker(this);
 
         this.hero = new Hero(textureAtlasManager.getTextureAtlas("hero"), 4, 4, environment.getSquareSize());
-        addEnemies(textureManager.getTexture("enemy"), levelConfiguration.getEnemyNumber());
+        addEnemies(textureAtlasManager.getTextureAtlas("enemy"), levelConfiguration.getEnemyNumber());
 
         this.gameObjects = new Group();
         gameObjects.addActor(hero);
@@ -444,7 +445,7 @@ public class GameManager {
         }
     }
 
-    private void addEnemies(Texture texture, int number) {
+    private void addEnemies(TextureAtlas textureAtlas, int number) {
         int iterations = 0;
         int enemyCount = 0;
         while (enemyCount < number && iterations < number * 10) {
@@ -452,7 +453,7 @@ public class GameManager {
             int x = MathUtils.random(environment.getSizeX());
             int y = MathUtils.random(environment.getSizeY());
             if (isAllowedCreateObjectThere(x, y)) {
-                enemies.add(new Enemy(texture, x, y, environment.getSquareSize()));
+                enemies.add(new Enemy(textureAtlas, x, y, environment.getSquareSize()));
                 enemyCount++;
             }
         }
