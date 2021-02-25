@@ -14,6 +14,7 @@ import com.kanasuki.game.test.actor.Square;
 import com.kanasuki.game.test.actor.Wall;
 import com.kanasuki.game.test.input.PlayerInput;
 import com.kanasuki.game.test.level.LevelConfiguration;
+import com.kanasuki.game.test.texture.TextureAtlasManager;
 import com.kanasuki.game.test.texture.TextureManager;
 import com.kanasuki.game.test.utils.WinningConditionChecker;
 
@@ -37,6 +38,7 @@ public class GameManager {
 
     private final TextureManager textureManager;
 
+    private final TextureAtlasManager textureAtlasManager;
     private final LevelConfiguration levelConfiguration;
 
     private Set<PlayerInput> movingCommands;
@@ -60,8 +62,9 @@ public class GameManager {
 
     private int score;
 
-    public GameManager(TextureManager textureManager, LevelConfiguration levelConfiguration, TestGame testGame) {
+    public GameManager(TextureManager textureManager, TextureAtlasManager textureAtlasManager, LevelConfiguration levelConfiguration, TestGame testGame) {
         this.textureManager = textureManager;
+        this.textureAtlasManager = textureAtlasManager;
         this.levelConfiguration = levelConfiguration;
         this.walls = new HashSet<>();
         this.enemies = new HashSet<>();
@@ -138,7 +141,7 @@ public class GameManager {
 
         this.winningConditionChecker = new WinningConditionChecker(this);
 
-        this.hero = new Hero(textureManager.getTexture("hero"), 4, 4, environment.getSquareSize());
+        this.hero = new Hero(textureAtlasManager.getTextureAtlas("hero"), 4, 4, environment.getSquareSize());
         addEnemies(textureManager.getTexture("enemy"), levelConfiguration.getEnemyNumber());
 
         this.gameObjects = new Group();

@@ -10,11 +10,13 @@ import com.badlogic.gdx.graphics.g2d.Animation;
 import com.badlogic.gdx.graphics.g2d.TextureAtlas;
 import com.badlogic.gdx.scenes.scene2d.Actor;
 import com.badlogic.gdx.scenes.scene2d.Stage;
+import com.badlogic.gdx.utils.Logger;
 import com.badlogic.gdx.utils.viewport.FillViewport;
 import com.kanasuki.game.test.GameManager;
 import com.kanasuki.game.test.gui.GameScreenLayout;
 import com.kanasuki.game.test.gui.GuiFactory;
 import com.kanasuki.game.test.TestGame;
+import com.kanasuki.game.test.texture.TextureAtlasManager;
 import com.kanasuki.game.test.texture.TextureManager;
 import com.kanasuki.game.test.input.PlayerInputProcessor;
 import com.kanasuki.game.test.level.LevelConfiguration;
@@ -27,6 +29,7 @@ public class GameScreen implements Screen {
     private final GameManager gameManager;
     private final PlayerInputProcessor playerInputProcessor;
     private final TestGame testGame;
+    private final TextureAtlasManager textureAtlasManager;
     private final GameScreenLayout gameScreenLayout;
 
     private final GuiFactory guiFactory;
@@ -36,12 +39,13 @@ public class GameScreen implements Screen {
     private float oneSecond = 0;
     private int frames = 0;
 
-    public GameScreen(TestGame testGame, TextureManager textureManager, LevelConfiguration levelConfiguration) {
+    public GameScreen(TestGame testGame, TextureManager textureManager, TextureAtlasManager textureAtlasManager, LevelConfiguration levelConfiguration) {
         this.testGame = testGame;
+        this.textureAtlasManager = textureAtlasManager;
         this.camera = new OrthographicCamera();
         this.textureManager = textureManager;
 
-        this.gameManager = new GameManager(textureManager, levelConfiguration, testGame);
+        this.gameManager = new GameManager(textureManager, textureAtlasManager, levelConfiguration, testGame);
 
         this.uiStage = new Stage();
         this.gameStage = new Stage(new FillViewport(1500, 1000, camera));
@@ -72,7 +76,7 @@ public class GameScreen implements Screen {
 
         if (oneSecond > 1) {
             oneSecond = oneSecond % 1;
-            System.out.println("fps: " + frames);
+            Gdx.app.log(GameScreen.class.toString(), "fps: " + frames);
             frames = 0;
         }
 
