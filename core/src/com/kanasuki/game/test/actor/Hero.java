@@ -1,15 +1,15 @@
 package com.kanasuki.game.test.actor;
 
 import com.badlogic.gdx.graphics.Camera;
-import com.badlogic.gdx.graphics.Texture;
+import com.badlogic.gdx.graphics.g2d.Animation;
 import com.badlogic.gdx.graphics.g2d.TextureAtlas;
 
 public class Hero extends AnimatedGameActor {
 
     private Camera camera;
 
-    public Hero(TextureAtlas textureAtlas, int fieldX, int fieldY, int squareSize) {
-      super(textureAtlas, fieldX, fieldY, squareSize);
+    public Hero(Animation<TextureAtlas.AtlasRegion> animation, int fieldX, int fieldY, int squareSize) {
+      super(animation, fieldX, fieldY, squareSize);
     }
 
     @Override

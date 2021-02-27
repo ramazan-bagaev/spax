@@ -2,6 +2,7 @@ package com.kanasuki.game.test;
 
 import com.badlogic.gdx.Gdx;
 import com.badlogic.gdx.graphics.Texture;
+import com.badlogic.gdx.graphics.g2d.Animation;
 import com.badlogic.gdx.graphics.g2d.TextureAtlas;
 import com.badlogic.gdx.math.MathUtils;
 import com.badlogic.gdx.scenes.scene2d.Actor;
@@ -15,7 +16,8 @@ import com.kanasuki.game.test.actor.Square;
 import com.kanasuki.game.test.actor.Wall;
 import com.kanasuki.game.test.input.PlayerInput;
 import com.kanasuki.game.test.level.LevelConfiguration;
-import com.kanasuki.game.test.texture.TextureAtlasManager;
+import com.kanasuki.game.test.texture.AnimationManager;
+import com.kanasuki.game.test.texture.AnimationProfile;
 import com.kanasuki.game.test.texture.TextureManager;
 import com.kanasuki.game.test.utils.WinningConditionChecker;
 
@@ -39,7 +41,7 @@ public class GameManager {
 
     private final TextureManager textureManager;
 
-    private final TextureAtlasManager textureAtlasManager;
+    private final AnimationManager animationManager;
     private final LevelConfiguration levelConfiguration;
 
     private Set<PlayerInput> movingCommands;
@@ -63,9 +65,9 @@ public class GameManager {
 
     private int score;
 
-    public GameManager(TextureManager textureManager, TextureAtlasManager textureAtlasManager, LevelConfiguration levelConfiguration, TestGame testGame) {
+    public GameManager(TextureManager textureManager, AnimationManager animationManager, LevelConfiguration levelConfiguration, TestGame testGame) {
         this.textureManager = textureManager;
-        this.textureAtlasManager = textureAtlasManager;
+        this.animationManager = animationManager;
         this.levelConfiguration = levelConfiguration;
         this.walls = new HashSet<>();
         this.enemies = new HashSet<>();
@@ -142,8 +144,8 @@ public class GameManager {
 
         this.winningConditionChecker = new WinningConditionChecker(this);
 
-        this.hero = new Hero(textureAtlasManager.getTextureAtlas("hero"), 4, 4, environment.getSquareSize());
-        addEnemies(textureAtlasManager.getTextureAtlas("enemy"), levelConfiguration.getEnemyNumber());
+        this.hero = new Hero(animationManager.getAnimation(AnimationProfile.HERO), 4, 4, environment.getSquareSize());
+        addEnemies(animationManager.getAnimation(AnimationProfile.ENEMY), levelConfiguration.getEnemyNumber());
 
         this.gameObjects = new Group();
         gameObjects.addActor(hero);
@@ -445,7 +447,7 @@ public class GameManager {
         }
     }
 
-    private void addEnemies(TextureAtlas textureAtlas, int number) {
+    private void addEnemies(Animation<TextureAtlas.AtlasRegion> animation, int number) {
         int iterations = 0;
         int enemyCount = 0;
         while (enemyCount < number && iterations < number * 10) {
@@ -453,7 +455,7 @@ public class GameManager {
             int x = MathUtils.random(environment.getSizeX());
             int y = MathUtils.random(environment.getSizeY());
             if (isAllowedCreateObjectThere(x, y)) {
-                enemies.add(new Enemy(textureAtlas, x, y, environment.getSquareSize()));
+                enemies.add(new Enemy(animation, x, y, environment.getSquareSize()));
                 enemyCount++;
             }
         }

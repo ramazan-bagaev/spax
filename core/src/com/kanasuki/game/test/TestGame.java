@@ -12,7 +12,7 @@ import com.kanasuki.game.test.screen.CustomizerScreen;
 import com.kanasuki.game.test.screen.GameScreen;
 import com.kanasuki.game.test.screen.LevelScreen;
 import com.kanasuki.game.test.screen.MenuScreen;
-import com.kanasuki.game.test.texture.TextureAtlasManager;
+import com.kanasuki.game.test.texture.AnimationManager;
 import com.kanasuki.game.test.texture.TextureManager;
 
 public class TestGame extends Game {
@@ -29,7 +29,7 @@ public class TestGame extends Game {
 	private ChooseGameTypeScreen chooseGameTypeScreen;
 
 	private TextureManager textureManager;
-	private TextureAtlasManager textureAtlasManager;
+	private AnimationManager animationManager;
 
 	private LevelConfiguration currentLevel;
 	private LevelMap levelMap;
@@ -47,7 +47,7 @@ public class TestGame extends Game {
 		//skin.getFont("font").getData().setScale(1.5f, 1.5f);
 
 		this.textureManager = new TextureManager();
-		this.textureAtlasManager = new TextureAtlasManager();
+		this.animationManager = new AnimationManager();
 		this.levelMap = new LevelMap();
 		this.gameStatisticGui = new GameStatisticGui();
 		this.gameProgress = new GameProgress();
@@ -75,7 +75,7 @@ public class TestGame extends Game {
         }
 
 		textureManager.dispose();
-		textureAtlasManager.dispose();
+		animationManager.dispose();
 	}
 
 	@Override
@@ -97,7 +97,7 @@ public class TestGame extends Game {
 			gameScreen.dispose();
 		}
 		this.currentLevel = levelConfiguration;
-		this.gameScreen = new GameScreen(this, textureManager, textureAtlasManager, levelConfiguration);
+		this.gameScreen = new GameScreen(this, textureManager, animationManager, levelConfiguration);
 	}
 
 	public String getStyle() {

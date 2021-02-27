@@ -8,8 +8,6 @@ import com.badlogic.gdx.scenes.scene2d.Actor;
 
 public class AnimatedGameActor extends Actor {
 
-    private static final float FRAME_PER_SECOND = 0.1f;
-
     private float x;
     private float y;
 
@@ -18,11 +16,11 @@ public class AnimatedGameActor extends Actor {
     private Animation<TextureAtlas.AtlasRegion> animation;
     private final int squareSize;
 
-    public AnimatedGameActor(TextureAtlas textureAtlas, int fieldX, int fieldY, int squareSize) {
+    public AnimatedGameActor(Animation<TextureAtlas.AtlasRegion> animation, int fieldX, int fieldY, int squareSize) {
         this.x = fieldX;
         this.y = fieldY;
 
-        this.animation = new Animation<>(FRAME_PER_SECOND, textureAtlas.getRegions(), Animation.PlayMode.LOOP);
+        this.animation = animation;
         this.squareSize = squareSize;
 
         setX(fieldX * squareSize);

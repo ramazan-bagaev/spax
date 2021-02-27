@@ -1,6 +1,6 @@
 
 hero-sprite.png
-size: 128,32
+size: 32,32
 format: RGBA8888
 filter: Nearest,Nearest
 repeat: none
@@ -13,21 +13,21 @@ hero1
   index: -1
 hero2
   rotate: false
-  xy: 24, 2
+  xy: 2, 2
   size: 20, 20
   orig: 20, 20
   offset: 0, 0
   index: -1
 hero3
   rotate: false
-  xy: 46, 2
+  xy: 2, 2
   size: 20, 20
   orig: 20, 20
   offset: 0, 0
   index: -1
 hero4
   rotate: false
-  xy: 68, 2
+  xy: 2, 2
   size: 20, 20
   orig: 20, 20
   offset: 0, 0
