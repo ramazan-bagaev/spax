@@ -5,8 +5,9 @@ import com.badlogic.gdx.graphics.g2d.Animation;
 import com.badlogic.gdx.graphics.g2d.Batch;
 import com.badlogic.gdx.graphics.g2d.TextureAtlas;
 import com.badlogic.gdx.scenes.scene2d.Actor;
+import com.kanasuki.game.test.mechanic.Collidable;
 
-public class AnimatedGameActor extends Actor {
+public class AnimatedGameActor extends Actor implements Collidable {
 
     private float x;
     private float y;

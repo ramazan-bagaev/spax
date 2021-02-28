@@ -16,6 +16,7 @@ import com.kanasuki.game.test.actor.Square;
 import com.kanasuki.game.test.actor.Wall;
 import com.kanasuki.game.test.input.PlayerInput;
 import com.kanasuki.game.test.level.LevelConfiguration;
+import com.kanasuki.game.test.mechanic.Collidable;
 import com.kanasuki.game.test.texture.AnimationManager;
 import com.kanasuki.game.test.texture.AnimationProfile;
 import com.kanasuki.game.test.texture.TextureManager;
@@ -38,6 +39,9 @@ public class GameManager {
     private final Collection<Wall> walls;
     private final Collection<Enemy> enemies;
     private final Collection<DeadEnemy> deadEnemies;
+
+    private final Collection<Collidable> allObjects;
+    private final Collection<Collidable> obstructions;
 
     private final TextureManager textureManager;
 
@@ -74,6 +78,8 @@ public class GameManager {
         this.deadEnemies = new HashSet<>();
         this.movingCommands = new HashSet<>();
         this.actionCommands = new LinkedList<>();
+        this.allObjects = new HashSet<>();
+        this.obstructions = new HashSet<>();
         this.testGame = testGame;
         this.gameLoosed = false;
         this.gameWon = false;
@@ -164,6 +170,12 @@ public class GameManager {
         gameGroup.addActor(environment);
         gameGroup.addActor(gameObjects);
 
+        allObjects.addAll(walls);
+        allObjects.addAll(enemies);
+        allObjects.add(hero);
+
+        obstructions.addAll(walls);
+
         return gameGroup;
     }
 
@@ -246,7 +258,7 @@ public class GameManager {
         this.previousDeltaX = totalX;
         this.previousDeltaY = totalY;
 
-        if (canMoveThere(fieldX, fieldY)) {
+        if (isFree(fieldX, fieldY)) {
             MoveByAction action = new MoveByAction();
             action.setAmount(totalX * squareSize, totalY * squareSize);
 
@@ -289,16 +301,6 @@ public class GameManager {
         return false;
     }
 
-    public boolean isInDeadEnemy(int x, int y) {
-        for (DeadEnemy deadEnemy: deadEnemies) {
-            if (deadEnemy.isInField(x, y)) {
-                return true;
-            }
-        }
-
-        return false;
-    }
-
     private boolean checkWon() {
         for (Iterator<Enemy> iterator = enemies.iterator(); iterator.hasNext(); ) {
             Enemy enemy = iterator.next();
@@ -320,6 +322,8 @@ public class GameManager {
 
                 deadEnemies.add(deadEnemy);
                 gameObjects.addActor(deadEnemy);
+                allObjects.add(deadEnemy);
+                obstructions.add(deadEnemy);
             }
         }
 
@@ -336,7 +340,7 @@ public class GameManager {
 
         switch (MathUtils.random(4)) {
             case 0:
-                if (canMoveThere(fieldX, fieldY + 1) && !isInEnemy(fieldX, fieldY + 1)) {
+                if (isFree(fieldX, fieldY + 1) && !isInEnemy(fieldX, fieldY + 1)) {
                     MoveByAction moveByAction = new MoveByAction();
                     moveByAction.setAmount(0, squareSize);
                     //moveByAction.setDuration(0.2f);
@@ -344,7 +348,7 @@ public class GameManager {
                 }
                 break;
             case 1:
-                if (canMoveThere(fieldX, fieldY - 1) && !isInEnemy(fieldX, fieldY - 1)) {
+                if (isFree(fieldX, fieldY - 1) && !isInEnemy(fieldX, fieldY - 1)) {
                     MoveByAction moveByAction = new MoveByAction();
                     moveByAction.setAmount(0, -squareSize);
                     //moveByAction.setDuration(0.2f);
@@ -352,7 +356,7 @@ public class GameManager {
                 }
                 break;
             case 2:
-                if (canMoveThere(fieldX + 1, fieldY) && !isInEnemy(fieldX + 1, fieldY)) {
+                if (isFree(fieldX + 1, fieldY) && !isInEnemy(fieldX + 1, fieldY)) {
                     MoveByAction moveByAction = new MoveByAction();
                     moveByAction.setAmount(squareSize, 0);
                     //moveByAction.setDuration(0.2f);
@@ -360,7 +364,7 @@ public class GameManager {
                 }
                 break;
             case 3:
-                if (canMoveThere(fieldX - 1, fieldY) && !isInEnemy(fieldX - 1, fieldY)) {
+                if (isFree(fieldX - 1, fieldY) && !isInEnemy(fieldX - 1, fieldY)) {
                     MoveByAction moveByAction = new MoveByAction();
                     moveByAction.setAmount(-squareSize, 0);
                     //moveByAction.setDuration(0.2f);
@@ -370,17 +374,15 @@ public class GameManager {
         }
     }
 
-    private boolean canMoveThere(int x, int y) {
+    private boolean isFree(int x, int y) {
         if (!environment.isInEnvironment(x, y)) {
             return false;
         }
 
-        if (isInWall(x, y)) {
-            return false;
-        }
-
-        if (isInDeadEnemy(x, y)) {
-            return false;
+        for (Collidable collidable: obstructions) {
+            if (collidable.isInField(x, y)) {
+                return false;
+            }
         }
 
         return true;
@@ -391,20 +393,10 @@ public class GameManager {
             return false;
         }
 
-        if (isInWall(x, y)) {
-            return false;
-        }
-
-        if (isInEnemy(x, y)) {
-            return false;
-        }
-
-        if (hero.isInField(x, y)) {
-            return false;
-        }
-
-        if (isInDeadEnemy(x, y)) {
-            return false;
+        for (Collidable collidable: allObjects) {
+            if (collidable.isInField(x, y)) {
+                return false;
+            }
         }
 
         return true;
@@ -420,6 +412,8 @@ public class GameManager {
             Wall wall = new Wall(textureManager.getTexture("wall"), fieldX, fieldY, squareSize);
             walls.add(wall);
             gameObjects.addActor(wall);
+            allObjects.add(wall);
+            obstructions.add(wall);
 
             if (checkWon()) {
                 this.gameWon = true;
@@ -442,6 +436,8 @@ public class GameManager {
             if (fieldX == x && fieldY == y) {
                 iterator.remove();
                 gameObjects.removeActor(wall);
+                allObjects.remove(wall);
+                obstructions.remove(wall);
                 return;
             }
         }
