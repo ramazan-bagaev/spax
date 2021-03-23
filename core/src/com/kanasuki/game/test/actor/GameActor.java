@@ -1,42 +1,10 @@
 package com.kanasuki.game.test.actor;
 
-import com.badlogic.gdx.graphics.Texture;
-import com.badlogic.gdx.graphics.g2d.Batch;
-import com.badlogic.gdx.graphics.g2d.Sprite;
-import com.badlogic.gdx.scenes.scene2d.Actor;
-import com.kanasuki.game.test.mechanic.Collidable;
+public interface GameActor {
 
-public class GameActor extends Actor implements Collidable {
+    ActorType getType();
 
-    private final int squareSize;
+    boolean isInField(int x, int y);
 
-    private final Sprite sprite;
-
-    GameActor(Texture texture, int fieldX, int fieldY, int squareSize) {
-        this.sprite = new Sprite(texture);
-        this.squareSize = squareSize;
-
-        sprite.setSize(squareSize, squareSize);
-
-        setX(fieldX * squareSize);
-        setY(fieldY * squareSize);
-    }
-
-    public boolean isInField(int x, int y) {
-        int fieldX = (int) (getX() / squareSize);
-        int fieldY = (int) (getY() / squareSize);
-
-        return fieldX == x && fieldY == y;
-    }
-
-    @Override
-    public void draw(Batch batch, float alpha) {
-        sprite.draw(batch);
-    }
-
-    @Override
-    protected void positionChanged() {
-        sprite.setPosition(getX(), getY());
-        super.positionChanged();
-    }
+    void act(GameActorField gameActorField);
 }

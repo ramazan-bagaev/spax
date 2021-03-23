@@ -4,6 +4,7 @@ gwt {
     minHeapSize="1G"
 
     src = files(file("src/")) // Needs to be in front of "modules" below.
+    src += files(new File(project(":core").projectDir, "/build/generated/sources/annotationProcessor/java/main"))
     modules 'com.kanasuki.game.test.GdxDefinition'
     devModules 'com.kanasuki.game.test.GdxDefinitionSuperdev'
     project.webAppDirName = 'webapp'
@@ -77,4 +78,4 @@ tasks.compileGwt.dependsOn(addSource)
 tasks.draftCompileGwt.dependsOn(addSource)
 
 sourceCompatibility = 1.7
-sourceSets.main.java.srcDirs = [ "src/" ]
+sourceSets.main.java.srcDirs += [ "src/" ]

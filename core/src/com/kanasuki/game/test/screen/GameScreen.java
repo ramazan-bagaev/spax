@@ -83,7 +83,7 @@ public class GameScreen implements Screen {
         if (!gameManager.isGameEnded()) {
             gameManager.makeTurn(delta);
 
-            if (gameManager.isGameLoosed()) {
+            if (gameManager.isGameLost()) {
                 Actor actor = guiFactory.createGameOverWindow(testGame, testGame.getSkin(),
                         testGame.getStyle(), textureManager);
                 gameScreenLayout.getMiddlePlace().add(actor);

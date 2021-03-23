@@ -5,9 +5,8 @@ import com.badlogic.gdx.graphics.g2d.Animation;
 import com.badlogic.gdx.graphics.g2d.Batch;
 import com.badlogic.gdx.graphics.g2d.TextureAtlas;
 import com.badlogic.gdx.scenes.scene2d.Actor;
-import com.kanasuki.game.test.mechanic.Collidable;
 
-public class AnimatedGameActor extends Actor implements Collidable {
+public class AnimatedGameActor extends Actor implements GameActor {
 
     private float x;
     private float y;
@@ -28,11 +27,21 @@ public class AnimatedGameActor extends Actor implements Collidable {
         setY(fieldY * squareSize);
     }
 
+    @Override
+    public ActorType getType() {
+        return ActorType.SOFT;
+    }
+
     public boolean isInField(int x, int y) {
         int fieldX = (int) (getX() / squareSize);
         int fieldY = (int) (getY() / squareSize);
 
         return fieldX == x && fieldY == y;
+    }
+
+    @Override
+    public void act(GameActorField gameActorField) {
+
     }
 
     @Override

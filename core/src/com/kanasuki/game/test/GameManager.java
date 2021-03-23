@@ -8,25 +8,15 @@ import com.badlogic.gdx.math.MathUtils;
 import com.badlogic.gdx.scenes.scene2d.Actor;
 import com.badlogic.gdx.scenes.scene2d.Group;
 import com.badlogic.gdx.scenes.scene2d.actions.MoveByAction;
-import com.kanasuki.game.test.actor.DeadEnemy;
-import com.kanasuki.game.test.actor.Enemy;
-import com.kanasuki.game.test.actor.Environment;
-import com.kanasuki.game.test.actor.Hero;
-import com.kanasuki.game.test.actor.Square;
-import com.kanasuki.game.test.actor.Wall;
+import com.kanasuki.game.test.actor.*;
 import com.kanasuki.game.test.input.PlayerInput;
 import com.kanasuki.game.test.level.LevelConfiguration;
-import com.kanasuki.game.test.mechanic.Collidable;
 import com.kanasuki.game.test.texture.AnimationManager;
 import com.kanasuki.game.test.texture.AnimationProfile;
 import com.kanasuki.game.test.texture.TextureManager;
 import com.kanasuki.game.test.utils.WinningConditionChecker;
 
-import java.util.Collection;
-import java.util.HashSet;
-import java.util.Iterator;
-import java.util.LinkedList;
-import java.util.Set;
+import java.util.*;
 
 public class GameManager {
 
@@ -40,8 +30,8 @@ public class GameManager {
     private final Collection<Enemy> enemies;
     private final Collection<DeadEnemy> deadEnemies;
 
-    private final Collection<Collidable> allObjects;
-    private final Collection<Collidable> obstructions;
+    private final Collection<GameActor> allObjects;
+    private final Collection<GameActor> obstructions;
 
     private final TextureManager textureManager;
 
@@ -56,7 +46,7 @@ public class GameManager {
 
     private TestGame testGame;
 
-    private boolean gameLoosed;
+    private boolean gameLost;
     private boolean gameWon;
 
     private int previousDeltaX = 0;
@@ -68,6 +58,9 @@ public class GameManager {
     private int squareSize;
 
     private int score;
+
+    private final GameActorField gameActorField;
+    private final GameActorManager gameActorManager;
 
     public GameManager(TextureManager textureManager, AnimationManager animationManager, LevelConfiguration levelConfiguration, TestGame testGame) {
         this.textureManager = textureManager;
@@ -81,22 +74,25 @@ public class GameManager {
         this.allObjects = new HashSet<>();
         this.obstructions = new HashSet<>();
         this.testGame = testGame;
-        this.gameLoosed = false;
+        this.gameLost = false;
         this.gameWon = false;
         this.score = 0;
+
+        this.gameActorManager = new GameActorManager();
+        this.gameActorField = null;//new GameActorField(gameActorManager);
     }
 
     public void makeTurn(float delta) {
         timeWithoutInputProcessing += delta;
         timeWithoutAiTurn += delta;
 
-        if (!gameLoosed) {
+        if (!gameLost) {
             if (timeWithoutInputProcessing > 0.09f) {
                 processInput();
                 timeWithoutInputProcessing = 0f;
 
                 if (checkLoosed()) {
-                    this.gameLoosed = true;
+                    this.gameLost = true;
                     return;
                 }
             }
@@ -106,7 +102,7 @@ public class GameManager {
                 timeWithoutAiTurn = 0;
 
                 if (checkLoosed()) {
-                    this.gameLoosed = true;
+                    this.gameLost = true;
                     return;
                 }
             }
@@ -129,8 +125,8 @@ public class GameManager {
         return levelConfiguration;
     }
 
-    public boolean isGameLoosed() {
-        return gameLoosed;
+    public boolean isGameLost() {
+        return gameLost;
     }
 
     public Group createGameGroup() {
@@ -258,7 +254,7 @@ public class GameManager {
         this.previousDeltaX = totalX;
         this.previousDeltaY = totalY;
 
-        if (isFree(fieldX, fieldY)) {
+        if (gameActorField.isFreeToMove(fieldX, fieldY)) {
             MoveByAction action = new MoveByAction();
             action.setAmount(totalX * squareSize, totalY * squareSize);
 
@@ -379,11 +375,11 @@ public class GameManager {
             return false;
         }
 
-        for (Collidable collidable: obstructions) {
+        /*for (Collidable collidable: obstructions) {
             if (collidable.isInField(x, y)) {
                 return false;
             }
-        }
+        }*/
 
         return true;
     }
@@ -393,12 +389,12 @@ public class GameManager {
             return false;
         }
 
-        for (Collidable collidable: allObjects) {
+        /*for (Collidable collidable: allObjects) {
             if (collidable.isInField(x, y)) {
                 return false;
             }
         }
-
+*/
         return true;
     }
 
@@ -462,7 +458,7 @@ public class GameManager {
     }
 
     public boolean isGameEnded() {
-        return gameWon || gameLoosed;
+        return gameWon || gameLost;
     }
 
     public int getScore() {

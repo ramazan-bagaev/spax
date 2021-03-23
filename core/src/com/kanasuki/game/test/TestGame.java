@@ -4,14 +4,12 @@ import com.badlogic.gdx.Game;
 import com.badlogic.gdx.Gdx;
 import com.badlogic.gdx.graphics.g2d.BitmapFont;
 import com.badlogic.gdx.scenes.scene2d.ui.Skin;
+import com.kanasuki.game.test.di.DaggerSpaxComponent;
+import com.kanasuki.game.test.di.SpaxComponent;
 import com.kanasuki.game.test.gui.GameStatisticGui;
 import com.kanasuki.game.test.level.LevelConfiguration;
 import com.kanasuki.game.test.level.LevelMap;
-import com.kanasuki.game.test.screen.ChooseGameTypeScreen;
-import com.kanasuki.game.test.screen.CustomizerScreen;
-import com.kanasuki.game.test.screen.GameScreen;
-import com.kanasuki.game.test.screen.LevelScreen;
-import com.kanasuki.game.test.screen.MenuScreen;
+import com.kanasuki.game.test.screen.*;
 import com.kanasuki.game.test.texture.AnimationManager;
 import com.kanasuki.game.test.texture.TextureManager;
 
@@ -41,6 +39,10 @@ public class TestGame extends Game {
 	@Override
 	public void create() {
 		//this.font = new BitmapFont(Gdx.files.internal("default2.fnt"), false);
+
+		SpaxComponent spaxComponent = DaggerSpaxComponent.create();
+
+		spaxComponent.inject(this);
 
 
 		this.skin = new Skin(Gdx.files.internal("skin/flat-earth-ui.json"));
