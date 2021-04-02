@@ -3,12 +3,17 @@ package com.kanasuki.game.test.actor;
 import com.badlogic.gdx.Gdx;
 import com.kanasuki.game.test.level.LevelConfiguration;
 
+import javax.inject.Inject;
+import javax.inject.Singleton;
+
+@Singleton
 public class GameActorFieldGenerator {
 
     private static int DEFAULT_SQUARE_SIZE = 50;
 
     private GameActorManager gameActorManager;
 
+    @Inject
     public GameActorFieldGenerator(GameActorManager gameActorManager) {
         this.gameActorManager = gameActorManager;
     }

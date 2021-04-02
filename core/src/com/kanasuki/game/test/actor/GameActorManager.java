@@ -1,12 +1,16 @@
 package com.kanasuki.game.test.actor;
 
+import javax.inject.Inject;
+import javax.inject.Singleton;
 import java.util.Collection;
 import java.util.HashSet;
 
+@Singleton
 public class GameActorManager {
 
     private Collection<GameActor> gameActors;
 
+    @Inject
     public GameActorManager() {
         this.gameActors = new HashSet<>();
     }

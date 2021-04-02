@@ -10,13 +10,16 @@ import com.badlogic.gdx.scenes.scene2d.Actor;
 import com.badlogic.gdx.scenes.scene2d.Stage;
 import com.badlogic.gdx.utils.viewport.FillViewport;
 import com.kanasuki.game.test.GameManager;
+import com.kanasuki.game.test.GameProgress;
 import com.kanasuki.game.test.gui.GameScreenLayout;
+import com.kanasuki.game.test.gui.GameStatisticGui;
 import com.kanasuki.game.test.gui.GuiFactory;
-import com.kanasuki.game.test.TestGame;
-import com.kanasuki.game.test.texture.AnimationManager;
-import com.kanasuki.game.test.texture.TextureManager;
 import com.kanasuki.game.test.input.PlayerInputProcessor;
 import com.kanasuki.game.test.level.LevelConfiguration;
+import com.kanasuki.game.test.management.LevelManager;
+import com.kanasuki.game.test.management.StyleManager;
+import com.kanasuki.game.test.texture.AnimationManager;
+import com.kanasuki.game.test.texture.TextureManager;
 
 public class GameScreen implements Screen {
 
@@ -25,9 +28,12 @@ public class GameScreen implements Screen {
     private final TextureManager textureManager;
     private final GameManager gameManager;
     private final PlayerInputProcessor playerInputProcessor;
-    private final TestGame testGame;
     private final AnimationManager animationManager;
+    private final LevelManager levelManager;
+    private final StyleManager styleManager;
     private final GameScreenLayout gameScreenLayout;
+
+    private final GameProgress gameProgress;
 
     private final GuiFactory guiFactory;
 
@@ -36,13 +42,17 @@ public class GameScreen implements Screen {
     private float oneSecond = 0;
     private int frames = 0;
 
-    public GameScreen(TestGame testGame, TextureManager textureManager, AnimationManager animationManager, LevelConfiguration levelConfiguration) {
-        this.testGame = testGame;
+    public GameScreen(TextureManager textureManager, AnimationManager animationManager,
+                      LevelConfiguration levelConfiguration, GuiFactory guiFactory, GameProgress gameProgress,
+                      GameStatisticGui gameStatisticGui, LevelManager levelManager, StyleManager styleManager) {
         this.animationManager = animationManager;
+        this.levelManager = levelManager;
+        this.styleManager = styleManager;
         this.camera = new OrthographicCamera();
         this.textureManager = textureManager;
+        this.gameProgress = gameProgress;
 
-        this.gameManager = new GameManager(textureManager, animationManager, levelConfiguration, testGame);
+        this.gameManager = new GameManager(textureManager, animationManager, levelConfiguration, gameStatisticGui);
 
         this.uiStage = new Stage();
         this.gameStage = new Stage(new FillViewport(1500, 1000, camera));
@@ -54,11 +64,11 @@ public class GameScreen implements Screen {
         camera.position.set(levelConfiguration.getWidth()/2 * squareSize, levelConfiguration.getHeight()/2 * squareSize, 0);
 
         this.playerInputProcessor = new PlayerInputProcessor(gameManager);
-        this.guiFactory = new GuiFactory();
+        this.guiFactory = guiFactory;
         this.gameScreenLayout = guiFactory.createGameScreenLayout();
         uiStage.addActor(gameScreenLayout);
-        gameScreenLayout.getTopBar().add(guiFactory.createTopBar(testGame, testGame.getSkin(),
-                testGame.getStyle(), textureManager)).growX();
+        gameScreenLayout.getTopBar().add(guiFactory.createTopBar(styleManager.getSkin(),
+                styleManager.getStyleName(), textureManager)).growX();
     }
 
     @Override
@@ -84,23 +94,23 @@ public class GameScreen implements Screen {
             gameManager.makeTurn(delta);
 
             if (gameManager.isGameLost()) {
-                Actor actor = guiFactory.createGameOverWindow(testGame, testGame.getSkin(),
-                        testGame.getStyle(), textureManager);
+                Actor actor = guiFactory.createGameOverWindow(styleManager.getSkin(),
+                        styleManager.getStyleName(), textureManager);
                 gameScreenLayout.getMiddlePlace().add(actor);
                 return;
             }
 
             if (gameManager.isGameWon()) {
-                testGame.getGameProgress().recordScore(testGame.getCurrentLevel().getLevel(), gameManager.getScore());
+                gameProgress.recordScore(levelManager.getCurrentLevel(), gameManager.getScore());
 
-                if (testGame.getCurrentLevel().getLevel() == testGame.getCurrentMaxLevel()) {
-                    testGame.nextLevel();
+                if (levelManager.getCurrentLevel() == levelManager.getCurrentMaxLevel()) {
+                    levelManager.nextMaxLevel();
                 }
 
 
 
-                Actor actor = guiFactory.createWinWindow(testGame, testGame.getSkin(),
-                        testGame.getStyle(), textureManager, gameManager.getScore());
+                Actor actor = guiFactory.createWinWindow(styleManager.getSkin(),
+                        styleManager.getStyleName(), textureManager, gameManager.getScore());
                 gameScreenLayout.getMiddlePlace().add(actor);
             }
         }

@@ -1,12 +1,16 @@
 package com.kanasuki.game.test;
 
+import javax.inject.Inject;
+import javax.inject.Singleton;
 import java.util.HashMap;
 import java.util.Map;
 
+@Singleton
 public class GameProgress {
 
     private Map<Integer, Integer> scoreMap;
 
+    @Inject
     public GameProgress() {
         this.scoreMap = new HashMap<>();
     }

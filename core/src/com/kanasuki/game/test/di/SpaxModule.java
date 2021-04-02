@@ -1,6 +1,6 @@
 package com.kanasuki.game.test.di;
 
-import com.kanasuki.game.test.texture.TextureManager;
+import com.kanasuki.game.test.TestGame;
 import dagger.Module;
 import dagger.Provides;
 
@@ -8,7 +8,7 @@ import dagger.Provides;
 public class SpaxModule {
 
     @Provides
-    public TextureManager textureManager() {
-        return new TextureManager();
+    public TestGame testGame() {
+        return TestGame.instance();
     }
 }

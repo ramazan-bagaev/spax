@@ -1,12 +1,16 @@
 package com.kanasuki.game.test.level;
 
+import javax.inject.Inject;
+import javax.inject.Singleton;
 import java.util.HashMap;
 import java.util.Map;
 
+@Singleton
 public class LevelMap {
 
     private final Map<Integer, LevelConfiguration> levelMap;
 
+    @Inject
     public LevelMap() {
         this.levelMap = new HashMap<>();
         init();

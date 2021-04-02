@@ -1,10 +1,15 @@
 package com.kanasuki.game.test.gui;
 
+import javax.inject.Inject;
+import javax.inject.Singleton;
+
+@Singleton
 public class GameStatisticGui {
 
     private CountLabel deadEnemyCountLabel;
     private ScoreLabel scoreLabel;
 
+    @Inject
     public GameStatisticGui() {
     }
 

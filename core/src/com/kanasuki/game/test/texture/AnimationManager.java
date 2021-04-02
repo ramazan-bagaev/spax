@@ -4,9 +4,12 @@ import com.badlogic.gdx.Gdx;
 import com.badlogic.gdx.graphics.g2d.Animation;
 import com.badlogic.gdx.graphics.g2d.TextureAtlas;
 
+import javax.inject.Inject;
+import javax.inject.Singleton;
 import java.util.HashMap;
 import java.util.Map;
 
+@Singleton
 public class AnimationManager {
 
     private final Map<AnimationProfile, String> fileNames;
@@ -15,6 +18,7 @@ public class AnimationManager {
 
     private final Map<AnimationProfile, Animation<TextureAtlas.AtlasRegion>> animationMap;
 
+    @Inject
     public AnimationManager() {
         this.fileNames = new HashMap<>();
         this.textureAtlasMap = new HashMap<>();

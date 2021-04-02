@@ -1,22 +1,42 @@
 package com.kanasuki.game.test.gui;
 
 import com.badlogic.gdx.Gdx;
-import com.badlogic.gdx.graphics.Texture;
-import com.badlogic.gdx.graphics.g2d.NinePatch;
 import com.badlogic.gdx.scenes.scene2d.Actor;
 import com.badlogic.gdx.scenes.scene2d.Event;
 import com.badlogic.gdx.scenes.scene2d.EventListener;
 import com.badlogic.gdx.scenes.scene2d.InputEvent;
-import com.badlogic.gdx.scenes.scene2d.Touchable;
 import com.badlogic.gdx.scenes.scene2d.ui.*;
 import com.badlogic.gdx.scenes.scene2d.utils.ChangeListener;
-import com.badlogic.gdx.scenes.scene2d.utils.NinePatchDrawable;
-import com.kanasuki.game.test.TestGame;
+import com.kanasuki.game.test.GameProgress;
+import com.kanasuki.game.test.event.EventManager;
+import com.kanasuki.game.test.event.EventType;
 import com.kanasuki.game.test.level.LevelConfiguration;
+import com.kanasuki.game.test.level.LevelMap;
+import com.kanasuki.game.test.management.LevelManager;
 import com.kanasuki.game.test.texture.TextureDrawable;
 import com.kanasuki.game.test.texture.TextureManager;
 
+import javax.inject.Inject;
+import javax.inject.Singleton;
+
+@Singleton
 public class GuiFactory {
+
+    private LevelMap levelMap;
+    private GameStatisticGui gameStatisticGui;
+    private GameProgress gameProgress;
+    private final LevelManager levelManager;
+    private final EventManager eventManager;
+
+    @Inject
+    public GuiFactory(LevelMap levelMap, GameProgress gameProgress, GameStatisticGui gameStatisticGui,
+                      LevelManager levelManager, EventManager eventManager) {
+        this.levelMap = levelMap;
+        this.gameProgress = gameProgress;
+        this.gameStatisticGui = gameStatisticGui;
+        this.levelManager = levelManager;
+        this.eventManager = eventManager;
+    }
 
     public GameScreenLayout createGameScreenLayout() {
         Table topBar = new Table();
@@ -25,14 +45,15 @@ public class GuiFactory {
         return new GameScreenLayout(topBar, middlePlace);
     }
 
-    public Actor createMenu(final TestGame game, Skin skin, String name, TextureManager textureManager) {
+    public Actor createMenu(Skin skin, String name, TextureManager textureManager) {
         Table table = new Table();
 
         TextButton playButton = new TextButton("play", skin);
         playButton.addListener(new ChangeListener() {
             @Override
             public void changed(ChangeEvent event, Actor actor) {
-                game.setScreen(game.getChooseGameTypeScreen());
+                eventManager.fire(EventType.CHOOSE_GAME_TYPE_SCREEN_ON);
+                //screenManager.setScreen(screenManager.getChooseGameTypeScreen());
             }
         });
 
@@ -63,7 +84,7 @@ public class GuiFactory {
         return mainLayout;
     }
 
-    public Actor createGameOverWindow(final TestGame game, Skin skin, String styleName, TextureManager textureManager) {
+    public Actor createGameOverWindow(Skin skin, String styleName, TextureManager textureManager) {
         Table table = new Table();
 
         Label gameOverLabel = new Label("game over", skin, "title");
@@ -71,8 +92,8 @@ public class GuiFactory {
         againButton.addListener(new ChangeListener() {
             @Override
             public void changed(ChangeEvent event, Actor actor) {
-                game.newGameScreen(game.getCurrentLevel());
-                game.setScreen(game.getGameScreen());
+                //screenManager.setScreen(screenManager.getGameScreen());
+                eventManager.fire(EventType.GAME_SCREEN_ON);
             }
         });
 
@@ -80,7 +101,8 @@ public class GuiFactory {
         exitButton.addListener(new ChangeListener() {
             @Override
             public void changed(ChangeEvent event, Actor actor) {
-                game.setScreen(game.getMenuScreen());
+                //screenManager.setScreen(screenManager.getMenuScreen());
+                eventManager.fire(EventType.MENU_SCREEN_ON);
             }
         });
 
@@ -99,7 +121,7 @@ public class GuiFactory {
         return table;
     }
 
-    public Actor createWinWindow(final TestGame game, Skin skin, String styleName, TextureManager textureManager, int score) {
+    public Actor createWinWindow(Skin skin, String styleName, TextureManager textureManager, final int score) {
         Table table = new Table();
 
         Label gameOverLabel = new Label("you win", skin, "title");
@@ -107,19 +129,20 @@ public class GuiFactory {
         againButton.addListener(new ChangeListener() {
             @Override
             public void changed(ChangeEvent event, Actor actor) {
-                game.newGameScreen(game.getCurrentLevel());
-                game.setScreen(game.getGameScreen());
+                //screenManager.setScreen(screenManager.getGameScreen());
+                eventManager.fire(EventType.GAME_SCREEN_ON);
             }
         });
 
-        StarAwardTable starAwardTable = new StarAwardTable(textureManager, game.getCurrentLevel().getStarAmount(score),
+        StarAwardTable starAwardTable = new StarAwardTable(textureManager, levelManager.getCurrentLevelConfiguration().getStarAmount(score),
                 (int) gameOverLabel.getHeight());
 
         TextButton exitButton = new TextButton("menu", skin);
         exitButton.addListener(new ChangeListener() {
             @Override
             public void changed(ChangeEvent event, Actor actor) {
-                game.setScreen(game.getMenuScreen());
+                //screenManager.setScreen(screenManager.getMenuScreen());
+                eventManager.fire(EventType.MENU_SCREEN_ON);
             }
         });
 
@@ -127,9 +150,12 @@ public class GuiFactory {
         nextLevel.addListener(new ChangeListener() {
             @Override
             public void changed(ChangeEvent event, Actor actor) {
-                LevelConfiguration levelConfiguration = game.getLevelMap().getLevel(game.getCurrentLevel().getLevel() + 1);
-                game.newGameScreen(levelConfiguration);
-                game.setScreen(game.getGameScreen());
+                eventManager.fire(EventType.NEXT_LEVEL);
+                //screenManager.nextMaxLevel();
+                //screenManager.setScreen(screenManager.getGameScreen());
+                //LevelConfiguration levelConfiguration = levelMap.getLevel(game.getCurrentLevel().getLevel() + 1);
+                //game.newGameScreen(levelConfiguration);
+                //game.setScreen(game.getGameScreen());
             }
         });
 
@@ -138,7 +164,7 @@ public class GuiFactory {
         horizontalGroup.space(10);
         horizontalGroup.addActor(exitButton);
 
-        if (game.getCurrentLevel().getLevel() != 10) {
+        if (levelManager.getCurrentLevel() != 10) {
             horizontalGroup.addActor(nextLevel);
         }
 
@@ -154,7 +180,7 @@ public class GuiFactory {
         return table;
     }
 
-    public Actor createTopBar(final TestGame game, Skin skin, String styleName, TextureManager textureManager) {
+    public Actor createTopBar(Skin skin, String styleName, TextureManager textureManager) {
         Table table = new Table();
 
         Table labelTable = new Table();
@@ -163,15 +189,16 @@ public class GuiFactory {
         exitButton.addListener(new ChangeListener() {
             @Override
             public void changed(ChangeEvent event, Actor actor) {
-                game.setScreen(game.getMenuScreen());
+                //screenManager.setScreen(screenManager.getMenuScreen());
+                eventManager.fire(EventType.MENU_SCREEN_ON);
             }
         });
 
-        Label currentLevel = new Label(game.getCurrentLevel().getLevel() + " level", skin, "button");
+        Label currentLevel = new Label(levelManager.getCurrentLevel() + " level", skin, "button");
         labelTable.add(currentLevel).padLeft(20).padRight(20);
         labelTable.setBackground(new TextureDrawable(textureManager.getTexture("window"), 0.7f));
 
-        CountLabel countLabel = new CountLabel(skin, "button", 0, game.getCurrentLevel().getEnemyNumber());
+        CountLabel countLabel = new CountLabel(skin, "button", 0, levelManager.getCurrentLevelConfiguration().getEnemyNumber());
         Image enemyImage = new Image(textureManager.getTexture("enemy"));
 
         ScoreLabel scoreLabel = new ScoreLabel(skin, "button", 0);
@@ -185,8 +212,8 @@ public class GuiFactory {
         countTable.add(enemyImage).width(countLabel.getHeight()).height(countLabel.getHeight());
         countTable.setBackground(new TextureDrawable(textureManager.getTexture("window"), 0.7f));
 
-        game.getGameStatisticGui().setEnemyCountLabel(countLabel);
-        game.getGameStatisticGui().setScoreLabel(scoreLabel);
+        gameStatisticGui.setEnemyCountLabel(countLabel);
+        gameStatisticGui.setScoreLabel(scoreLabel);
 
         table.add(labelTable).padRight(50);
         table.add(countTable).padLeft(50).padRight(20);
@@ -199,11 +226,12 @@ public class GuiFactory {
         return table;
     }
 
-    public Actor createScrollableLevels(final TestGame game, final Skin skin, final String styleName, TextureManager textureManager) {
+    public Actor createScrollableLevels(final Skin skin, final String styleName, TextureManager textureManager) {
         final Table table = new Table();
 
-        for (int level = 1; level <= game.getMaxLevel(); level++) {
-            LevelButton levelButton = new LevelButton(level <= game.getCurrentMaxLevel(), game, level, skin, textureManager);
+        for (int level = 1; level <= levelMap.getLevelNumbers(); level++) {
+            LevelButton levelButton = new LevelButton(level <= levelManager.getCurrentMaxLevel(), level, skin,
+                    textureManager, levelMap, gameProgress, levelManager, eventManager);
 
             table.add(levelButton).width(100).height(100).pad(30);
 
@@ -223,7 +251,7 @@ public class GuiFactory {
         return container;
     }
 
-    public Actor createLevelCustomizer(final TestGame game, Skin skin, String styleName, TextureManager textureManager) {
+    public Actor createLevelCustomizer(Skin skin, String styleName, TextureManager textureManager) {
         Table table = new Table();
         table.setBackground(new TextureDrawable(textureManager.getTexture("window"), 1f));
 
@@ -245,13 +273,16 @@ public class GuiFactory {
         textButton.addListener(new ChangeListener() {
             @Override
             public void changed(ChangeEvent event, Actor actor) {
-                game.newGameScreen(new LevelConfiguration(10,
+                levelManager.setCustomizableLevel(new LevelConfiguration(10,
                         enemyNumberSlider.getValue(),
                         widthSlider.getValue(),
                         heightSlider.getValue(),
                         killSquare.getValue()));
 
-                game.setScreen(game.getGameScreen());
+                //GameScreen gameScreen = screenManager.getGameScreen();
+                //screenManager.setScreen(gameScreen);
+
+                eventManager.fire(EventType.CUSTOMIZABLE_GAME_ON);
             }
         });
         table.add(textButton).pad(30);
@@ -260,14 +291,15 @@ public class GuiFactory {
         return table;
     }
 
-    public Actor createChooseGameType(final TestGame game, Skin skin, String styleName, TextureManager textureManager) {
+    public Actor createChooseGameType(Skin skin, String styleName, TextureManager textureManager) {
         Table table = new Table();
 
         TextButton levelButton = new TextButton("play levels", skin);
         levelButton.addListener(new ChangeListener() {
             @Override
             public void changed(ChangeEvent event, Actor actor) {
-                game.setScreen(game.getLevelScreen());
+                //screenManager.setScreen(screenManager.getLevelScreen());
+                eventManager.fire(EventType.LEVEL_SCREEN_ON);
             }
         });
 
@@ -275,7 +307,8 @@ public class GuiFactory {
         customizerLevelButton.addListener(new ChangeListener() {
             @Override
             public void changed(ChangeEvent event, Actor actor) {
-                game.setScreen(game.getCustomizerScreen());
+                //screenManager.setScreen(screenManager.getCustomizerScreen());
+                eventManager.fire(EventType.CUSTOMIZER_SCREEN_ON);
             }
         });
 

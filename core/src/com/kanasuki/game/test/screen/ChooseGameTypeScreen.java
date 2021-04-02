@@ -1,15 +1,14 @@
 package com.kanasuki.game.test.screen;
 
-import com.kanasuki.game.test.TestGame;
 import com.kanasuki.game.test.gui.GuiFactory;
+import com.kanasuki.game.test.management.StyleManager;
 import com.kanasuki.game.test.texture.TextureManager;
 
 public class ChooseGameTypeScreen extends GuiScreen {
 
-    public ChooseGameTypeScreen(TestGame game, TextureManager textureManager) {
-        GuiFactory guiFactory = new GuiFactory();
-
+    public ChooseGameTypeScreen(TextureManager textureManager, GuiFactory guiFactory, StyleManager styleManager) {
+        super(guiFactory);
         getGameScreenLayout().getMiddlePlace()
-                .add(guiFactory.createChooseGameType(game, game.getSkin(), game.getStyle(), textureManager));
+                .add(guiFactory.createChooseGameType(styleManager.getSkin(), styleManager.getStyleName(), textureManager));
     }
 }

@@ -3,15 +3,19 @@ package com.kanasuki.game.test.texture;
 import com.badlogic.gdx.Gdx;
 import com.badlogic.gdx.graphics.Texture;
 
+import javax.inject.Inject;
+import javax.inject.Singleton;
 import java.util.HashMap;
 import java.util.Map;
 
+@Singleton
 public class TextureManager {
 
     private Map<String, String> fileNames;
 
     private Map<String, Texture> textures;
 
+    @Inject
     public TextureManager() {
         this.fileNames = new HashMap<>();
         this.textures = new HashMap<>();

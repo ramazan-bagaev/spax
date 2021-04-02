@@ -8,7 +8,16 @@ import com.badlogic.gdx.math.MathUtils;
 import com.badlogic.gdx.scenes.scene2d.Actor;
 import com.badlogic.gdx.scenes.scene2d.Group;
 import com.badlogic.gdx.scenes.scene2d.actions.MoveByAction;
-import com.kanasuki.game.test.actor.*;
+import com.kanasuki.game.test.actor.DeadEnemy;
+import com.kanasuki.game.test.actor.Enemy;
+import com.kanasuki.game.test.actor.Environment;
+import com.kanasuki.game.test.actor.GameActor;
+import com.kanasuki.game.test.actor.GameActorField;
+import com.kanasuki.game.test.actor.GameActorManager;
+import com.kanasuki.game.test.actor.Hero;
+import com.kanasuki.game.test.actor.Square;
+import com.kanasuki.game.test.actor.Wall;
+import com.kanasuki.game.test.gui.GameStatisticGui;
 import com.kanasuki.game.test.input.PlayerInput;
 import com.kanasuki.game.test.level.LevelConfiguration;
 import com.kanasuki.game.test.texture.AnimationManager;
@@ -16,7 +25,11 @@ import com.kanasuki.game.test.texture.AnimationProfile;
 import com.kanasuki.game.test.texture.TextureManager;
 import com.kanasuki.game.test.utils.WinningConditionChecker;
 
-import java.util.*;
+import java.util.Collection;
+import java.util.HashSet;
+import java.util.Iterator;
+import java.util.LinkedList;
+import java.util.Set;
 
 public class GameManager {
 
@@ -44,8 +57,6 @@ public class GameManager {
 
     private WinningConditionChecker winningConditionChecker;
 
-    private TestGame testGame;
-
     private boolean gameLost;
     private boolean gameWon;
 
@@ -62,10 +73,14 @@ public class GameManager {
     private final GameActorField gameActorField;
     private final GameActorManager gameActorManager;
 
-    public GameManager(TextureManager textureManager, AnimationManager animationManager, LevelConfiguration levelConfiguration, TestGame testGame) {
+    private final GameStatisticGui gameStatisticGui;
+
+    public GameManager(TextureManager textureManager, AnimationManager animationManager,
+                       LevelConfiguration levelConfiguration, GameStatisticGui gameStatisticGui) {
         this.textureManager = textureManager;
         this.animationManager = animationManager;
         this.levelConfiguration = levelConfiguration;
+        this.gameStatisticGui = gameStatisticGui;
         this.walls = new HashSet<>();
         this.enemies = new HashSet<>();
         this.deadEnemies = new HashSet<>();
@@ -73,7 +88,6 @@ public class GameManager {
         this.actionCommands = new LinkedList<>();
         this.allObjects = new HashSet<>();
         this.obstructions = new HashSet<>();
-        this.testGame = testGame;
         this.gameLost = false;
         this.gameWon = false;
         this.score = 0;
@@ -310,9 +324,9 @@ public class GameManager {
             if (square <= levelConfiguration.getMaxEnemySquare()) {
                 iterator.remove();
                 gameObjects.removeActor(enemy);
-                testGame.getGameStatisticGui().increaseDeadEnemyCount();
+                gameStatisticGui.increaseDeadEnemyCount();
                 this.score += levelConfiguration.getMaxEnemySquare() - square + 1;
-                testGame.getGameStatisticGui().increaseScore(score);
+                gameStatisticGui.increaseScore(score);
                 DeadEnemy deadEnemy = new DeadEnemy(textureManager.getTexture("dead-enemy"),
                         fieldX, fieldY, environment.getSquareSize());
 

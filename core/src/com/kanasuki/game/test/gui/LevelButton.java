@@ -6,29 +6,36 @@ import com.badlogic.gdx.scenes.scene2d.ui.Skin;
 import com.badlogic.gdx.scenes.scene2d.ui.Table;
 import com.badlogic.gdx.scenes.scene2d.ui.TextButton;
 import com.badlogic.gdx.scenes.scene2d.utils.ChangeListener;
-import com.kanasuki.game.test.TestGame;
-import com.kanasuki.game.test.level.LevelConfiguration;
+import com.kanasuki.game.test.GameProgress;
+import com.kanasuki.game.test.event.EventManager;
+import com.kanasuki.game.test.event.EventType;
+import com.kanasuki.game.test.level.LevelMap;
+import com.kanasuki.game.test.management.LevelManager;
 import com.kanasuki.game.test.texture.TextureManager;
 
 public class LevelButton extends Table {
 
-    public LevelButton(boolean active, final TestGame game, int level, Skin skin, TextureManager textureManager) {
+    public LevelButton(boolean active, int level, Skin skin, TextureManager textureManager,
+                       final LevelMap levelMap, GameProgress gameProgress, final LevelManager levelManager, final EventManager eventManager) {
         if (active) {
             Actor actor = new TextButton(String.valueOf(level), skin);
             final int finalLevel = level;
             actor.addListener(new ChangeListener() {
                 @Override
                 public void changed(ChangeEvent event, Actor actor) {
-                    LevelConfiguration levelConfiguration = game.getLevelMap().getLevel(finalLevel);
-                    game.newGameScreen(levelConfiguration);
-                    game.setScreen(game.getGameScreen());
+                    levelManager.setLevel(finalLevel);
+                    eventManager.fire(EventType.GAME_SCREEN_ON);
+                    //screenManager.setScreen(screenManager.getGameScreen());
+                    //LevelConfiguration levelConfiguration = levelMap.getLevel(finalLevel);
+                    //game.newGameScreen(levelConfiguration);
+                    //game.setScreen(game.getGameScreen());
                 }
             });
             actor.setColor(0, 1, 0, 0.5f);
             add(actor);
             row();
             StarAwardTable starAwardTable = new StarAwardTable(textureManager,
-                    game.getLevelMap().getLevel(level).getStarAmount(game.getGameProgress().getScore(level)), (int) skin.getFont("button").getCapHeight());
+                    levelMap.getLevel(level).getStarAmount(gameProgress.getScore(level)), (int) skin.getFont("button").getCapHeight());
             add(starAwardTable);
             row();
         } else {

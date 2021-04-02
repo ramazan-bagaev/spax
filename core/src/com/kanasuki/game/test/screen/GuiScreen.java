@@ -12,10 +12,9 @@ public class GuiScreen implements Screen {
     private final Stage stage;
     private final GameScreenLayout gameScreenLayout;
 
-    GuiScreen() {
+    GuiScreen(GuiFactory guiFactory) {
         this.stage = new Stage();
 
-        GuiFactory guiFactory = new GuiFactory();
         this.gameScreenLayout = guiFactory.createGameScreenLayout();
         stage.addActor(gameScreenLayout);
     }
