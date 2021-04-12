@@ -1,6 +1,10 @@
 package com.kanasuki.game.test.level;
 
+import com.badlogic.gdx.Gdx;
+
 public class LevelConfiguration {
+
+    private static int DEFAULT_SQUARE_SIZE = 50;
 
     private final int level;
     private final int enemyNumber;
@@ -57,6 +61,11 @@ public class LevelConfiguration {
         }
 
         return 0;
+    }
+
+    public int getSquareSize() {
+        return Math.min(Math.min(Gdx.graphics.getWidth()/getWidth(),
+                Gdx.graphics.getHeight()/getHeight()), DEFAULT_SQUARE_SIZE);
     }
 
     public static class LevelConfigurationBuilder {

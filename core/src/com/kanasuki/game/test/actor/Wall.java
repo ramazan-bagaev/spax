@@ -7,4 +7,9 @@ public class Wall extends SpriteGameActor {
     public Wall(Texture texture, int fieldX, int fieldY, int squareSize) {
         super(texture, fieldX, fieldY, squareSize);
     }
+
+    @Override
+    public ActorType getType() {
+        return ActorType.HARD;
+    }
 }

@@ -5,15 +5,12 @@ import com.kanasuki.game.test.TestGame;
 import com.kanasuki.game.test.event.EventListener;
 import com.kanasuki.game.test.event.EventType;
 import com.kanasuki.game.test.level.LevelConfiguration;
-import com.kanasuki.game.test.screen.ChooseGameTypeScreen;
-import com.kanasuki.game.test.screen.CustomizerScreen;
-import com.kanasuki.game.test.screen.GameScreen;
-import com.kanasuki.game.test.screen.LevelScreen;
-import com.kanasuki.game.test.screen.MenuScreen;
-import com.kanasuki.game.test.screen.ScreenFactory;
+import com.kanasuki.game.test.screen.*;
 
 import javax.inject.Inject;
+import javax.inject.Singleton;
 
+@Singleton
 public class ScreenManager implements EventListener {
 
     private final TestGame testGame;
@@ -36,7 +33,7 @@ public class ScreenManager implements EventListener {
 
     public void init() {
         this.menuScreen = screenFactory.menuScreen();
-        this.levelScreen = screenFactory.levelScreen();
+        this.levelScreen = screenFactory.newLevelScreen();
         this.customizerScreen = screenFactory.customizerScreen();
         this.chooseGameTypeScreen = screenFactory.chooseGameTypeScreen();
     }
@@ -79,7 +76,7 @@ public class ScreenManager implements EventListener {
             levelScreen.dispose();
         }
 
-        levelScreen = screenFactory.levelScreen();
+        levelScreen = screenFactory.newLevelScreen();
     }
 
     public GameScreen getGameScreen(LevelConfiguration levelConfiguration) {
@@ -143,11 +140,8 @@ public class ScreenManager implements EventListener {
     }
 
     private void nextLevel() {
-        if (levelManager.getCurrentLevel() == levelManager.getCurrentMaxLevel()) {
-            levelManager.nextMaxLevel();
-        }
-
         levelManager.nextLevel();
         updateLevelScreen();
+        setScreen(getGameScreen());
     }
 }

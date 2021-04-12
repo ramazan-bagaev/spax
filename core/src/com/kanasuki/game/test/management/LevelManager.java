@@ -1,10 +1,13 @@
 package com.kanasuki.game.test.management;
 
+import com.badlogic.gdx.Gdx;
 import com.kanasuki.game.test.level.LevelConfiguration;
 import com.kanasuki.game.test.level.LevelMap;
 
 import javax.inject.Inject;
+import javax.inject.Singleton;
 
+@Singleton
 public class LevelManager {
 
     private int currentMaxLevel = 1;
@@ -16,6 +19,7 @@ public class LevelManager {
 
     @Inject
     public LevelManager(LevelMap levelMap) {
+        Gdx.app.log("debug", "created level manager");
         this.levelMap = levelMap;
     }
 

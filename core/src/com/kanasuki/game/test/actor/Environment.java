@@ -1,12 +1,17 @@
 package com.kanasuki.game.test.actor;
 
 import com.badlogic.gdx.scenes.scene2d.Group;
+import com.kanasuki.game.test.level.LevelConfiguration;
 
 public class Environment extends Group {
 
     private final int sizeX;
     private final int sizeY;
     private final int squareSize;
+
+    public Environment(LevelConfiguration levelConfiguration) {
+        this(levelConfiguration.getWidth(), levelConfiguration.getHeight(), levelConfiguration.getSquareSize());
+    }
 
     public Environment(int sizeX, int sizeY, int squareSize) {
         this.sizeX = sizeX;

@@ -17,7 +17,12 @@ public class GameActorField {
     }
 
     public boolean isFreeToMove(int x, int y) {
+        if (!environment.isInEnvironment(x, y)) {
+            return false;
+        }
+
         GameActor gameActor = gameActorManager.getGameActor(x, y);
+
 
         return gameActor == NullActor.instance || gameActor.getType() == ActorType.SOFT;
     }

@@ -25,12 +25,15 @@ import com.kanasuki.game.test.texture.AnimationProfile;
 import com.kanasuki.game.test.texture.TextureManager;
 import com.kanasuki.game.test.utils.WinningConditionChecker;
 
+import javax.inject.Inject;
+import javax.inject.Singleton;
 import java.util.Collection;
 import java.util.HashSet;
 import java.util.Iterator;
 import java.util.LinkedList;
 import java.util.Set;
 
+@Singleton
 public class GameManager {
 
     private static int DEFAULT_SQUARE_SIZE = 50;
@@ -75,8 +78,9 @@ public class GameManager {
 
     private final GameStatisticGui gameStatisticGui;
 
+    @Inject
     public GameManager(TextureManager textureManager, AnimationManager animationManager,
-                       LevelConfiguration levelConfiguration, GameStatisticGui gameStatisticGui) {
+                       LevelConfiguration levelConfiguration, GameStatisticGui gameStatisticGui, Environment environment, GameActorManager gameActorManager) {
         this.textureManager = textureManager;
         this.animationManager = animationManager;
         this.levelConfiguration = levelConfiguration;
@@ -91,9 +95,8 @@ public class GameManager {
         this.gameLost = false;
         this.gameWon = false;
         this.score = 0;
-
-        this.gameActorManager = new GameActorManager();
-        this.gameActorField = null;//new GameActorField(gameActorManager);
+        this.gameActorManager = gameActorManager;
+        this.gameActorField = new GameActorField(gameActorManager, environment);
     }
 
     public void makeTurn(float delta) {
@@ -105,7 +108,7 @@ public class GameManager {
                 processInput();
                 timeWithoutInputProcessing = 0f;
 
-                if (checkLoosed()) {
+                if (checkLost()) {
                     this.gameLost = true;
                     return;
                 }
@@ -115,7 +118,7 @@ public class GameManager {
                 makeAiTurn();
                 timeWithoutAiTurn = 0;
 
-                if (checkLoosed()) {
+                if (checkLost()) {
                     this.gameLost = true;
                     return;
                 }
@@ -125,14 +128,6 @@ public class GameManager {
 
     public Environment getEnvironment() {
         return environment;
-    }
-
-    public Collection<Enemy> getEnemies() {
-        return enemies;
-    }
-
-    public Hero getHero() {
-        return hero;
     }
 
     public LevelConfiguration getLevelConfiguration() {
@@ -185,6 +180,10 @@ public class GameManager {
         allObjects.add(hero);
 
         obstructions.addAll(walls);
+
+        for (GameActor gameActor: allObjects) {
+            gameActorManager.addGameActor(gameActor);
+        }
 
         return gameGroup;
     }
@@ -282,7 +281,7 @@ public class GameManager {
         }
     }
 
-    public boolean checkLoosed() {
+    public boolean checkLost() {
         int squareSize = environment.getSquareSize();
 
         int fieldX = (int) (hero.getX() / squareSize);
@@ -389,13 +388,15 @@ public class GameManager {
             return false;
         }
 
+        return gameActorField.isFreeToMove(x, y);
+
         /*for (Collidable collidable: obstructions) {
             if (collidable.isInField(x, y)) {
                 return false;
             }
         }*/
 
-        return true;
+        //return true;
     }
 
     private boolean isAllowedCreateObjectThere(int x, int y) {
@@ -424,7 +425,7 @@ public class GameManager {
             gameObjects.addActor(wall);
             allObjects.add(wall);
             obstructions.add(wall);
-
+            gameActorManager.addGameActor(wall);
             if (checkWon()) {
                 this.gameWon = true;
                 return;
@@ -448,6 +449,7 @@ public class GameManager {
                 gameObjects.removeActor(wall);
                 allObjects.remove(wall);
                 obstructions.remove(wall);
+                gameActorManager.removeGameActor(wall);
                 return;
             }
         }

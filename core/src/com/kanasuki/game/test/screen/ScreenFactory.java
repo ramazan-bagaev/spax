@@ -1,7 +1,7 @@
 package com.kanasuki.game.test.screen;
 
 import com.kanasuki.game.test.GameProgress;
-import com.kanasuki.game.test.gui.GameStatisticGui;
+import com.kanasuki.game.test.di.SpaxContext;
 import com.kanasuki.game.test.gui.GuiFactory;
 import com.kanasuki.game.test.level.LevelConfiguration;
 import com.kanasuki.game.test.management.LevelManager;
@@ -19,38 +19,33 @@ public class ScreenFactory {
     private final AnimationManager animationManager;
     private final GuiFactory guiFactory;
     private final GameProgress gameProgress;
-    private final GameStatisticGui gameStatisticGui;
     private final LevelManager levelManager;
     private final StyleManager styleManager;
+    private final SpaxContext spaxContext;
 
-    private LevelScreen levelScreen;
     private MenuScreen menuScreen;
     private CustomizerScreen customizerScreen;
     private ChooseGameTypeScreen chooseGameTypeScreen;
 
     @Inject
     public ScreenFactory(TextureManager textureManager, AnimationManager animationManager,
-                         GuiFactory guiFactory, GameProgress gameProgress, GameStatisticGui gameStatisticGui,
-                         LevelManager levelManager, StyleManager styleManager) {
+                         GuiFactory guiFactory, GameProgress gameProgress,
+                         LevelManager levelManager, StyleManager styleManager, SpaxContext spaxContext) {
         this.textureManager = textureManager;
         this.animationManager = animationManager;
         this.guiFactory = guiFactory;
         this.gameProgress = gameProgress;
-        this.gameStatisticGui = gameStatisticGui;
         this.levelManager = levelManager;
         this.styleManager = styleManager;
+        this.spaxContext = spaxContext;
     }
 
     public GameScreen newGameScreen(LevelConfiguration levelConfiguration) {
-        return new GameScreen(textureManager, animationManager, levelConfiguration, guiFactory, gameProgress, gameStatisticGui, levelManager, styleManager);
+        return new GameScreen(spaxContext, textureManager, animationManager, levelConfiguration, guiFactory, gameProgress, levelManager, styleManager);
     }
 
-    public LevelScreen levelScreen() {
-        if (levelScreen == null) {
-            this.levelScreen = new LevelScreen(textureManager, guiFactory, styleManager);
-        }
-
-        return levelScreen;
+    public LevelScreen newLevelScreen() {
+        return new LevelScreen(textureManager, guiFactory, styleManager);
     }
 
     public MenuScreen menuScreen() {
@@ -75,23 +70,5 @@ public class ScreenFactory {
         }
 
         return chooseGameTypeScreen;
-    }
-
-    public void dispose() {
-        if (menuScreen != null) {
-            menuScreen.dispose();
-        }
-
-        if (customizerScreen != null) {
-            customizerScreen.dispose();
-        }
-
-        if (chooseGameTypeScreen != null) {
-            chooseGameTypeScreen.dispose();
-        }
-
-        if (levelScreen != null) {
-            levelScreen.dispose();
-        }
     }
 }

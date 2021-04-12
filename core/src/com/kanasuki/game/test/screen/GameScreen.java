@@ -11,8 +11,11 @@ import com.badlogic.gdx.scenes.scene2d.Stage;
 import com.badlogic.gdx.utils.viewport.FillViewport;
 import com.kanasuki.game.test.GameManager;
 import com.kanasuki.game.test.GameProgress;
+import com.kanasuki.game.test.di.DaggerGameContext;
+import com.kanasuki.game.test.di.GameContext;
+import com.kanasuki.game.test.di.GameModule;
+import com.kanasuki.game.test.di.SpaxContext;
 import com.kanasuki.game.test.gui.GameScreenLayout;
-import com.kanasuki.game.test.gui.GameStatisticGui;
 import com.kanasuki.game.test.gui.GuiFactory;
 import com.kanasuki.game.test.input.PlayerInputProcessor;
 import com.kanasuki.game.test.level.LevelConfiguration;
@@ -42,17 +45,20 @@ public class GameScreen implements Screen {
     private float oneSecond = 0;
     private int frames = 0;
 
-    public GameScreen(TextureManager textureManager, AnimationManager animationManager,
+    public GameScreen(SpaxContext spaxContext, TextureManager textureManager, AnimationManager animationManager,
                       LevelConfiguration levelConfiguration, GuiFactory guiFactory, GameProgress gameProgress,
-                      GameStatisticGui gameStatisticGui, LevelManager levelManager, StyleManager styleManager) {
+                      LevelManager levelManager, StyleManager styleManager) {
         this.animationManager = animationManager;
         this.levelManager = levelManager;
         this.styleManager = styleManager;
         this.camera = new OrthographicCamera();
         this.textureManager = textureManager;
         this.gameProgress = gameProgress;
+        Gdx.app.log("debug", "created game screen");
 
-        this.gameManager = new GameManager(textureManager, animationManager, levelConfiguration, gameStatisticGui);
+        GameContext gameContext = DaggerGameContext.builder().gameModule(new GameModule(levelConfiguration, spaxContext)).build();
+
+        this.gameManager = gameContext.gameManager();//new GameManager(textureManager, animationManager, levelConfiguration, gameStatisticGui);
 
         this.uiStage = new Stage();
         this.gameStage = new Stage(new FillViewport(1500, 1000, camera));
@@ -102,6 +108,8 @@ public class GameScreen implements Screen {
 
             if (gameManager.isGameWon()) {
                 gameProgress.recordScore(levelManager.getCurrentLevel(), gameManager.getScore());
+
+                Gdx.app.log("debug", "game won; current level = " + levelManager.getCurrentLevel() + "; current max level = " + levelManager.getCurrentMaxLevel());
 
                 if (levelManager.getCurrentLevel() == levelManager.getCurrentMaxLevel()) {
                     levelManager.nextMaxLevel();

@@ -56,6 +56,7 @@ public class GuiScreen implements Screen {
     @Override
     public void dispose() {
         stage.dispose();
+        Gdx.app.log("error", "disposing screen: " + this.toString());
     }
 
     public GameScreenLayout getGameScreenLayout() {

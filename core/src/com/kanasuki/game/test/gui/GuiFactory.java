@@ -194,6 +194,8 @@ public class GuiFactory {
             }
         });
 
+        Gdx.app.log("debug", String.valueOf(levelManager.getCurrentLevel()));
+
         Label currentLevel = new Label(levelManager.getCurrentLevel() + " level", skin, "button");
         labelTable.add(currentLevel).padLeft(20).padRight(20);
         labelTable.setBackground(new TextureDrawable(textureManager.getTexture("window"), 0.7f));
