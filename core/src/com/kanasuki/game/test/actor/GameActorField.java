@@ -11,6 +11,10 @@ public class GameActorField {
     }
 
     public boolean isFreeToBuild(int x, int y) {
+        if (!environment.isInEnvironment(x, y)) {
+            return false;
+        }
+
         GameActor gameActor = gameActorManager.getGameActor(x, y);
 
         return gameActor == NullActor.instance;
@@ -22,7 +26,6 @@ public class GameActorField {
         }
 
         GameActor gameActor = gameActorManager.getGameActor(x, y);
-
 
         return gameActor == NullActor.instance || gameActor.getType() == ActorType.SOFT;
     }

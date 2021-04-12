@@ -399,27 +399,13 @@ public class GameManager {
         //return true;
     }
 
-    private boolean isAllowedCreateObjectThere(int x, int y) {
-        if (!environment.isInEnvironment(x, y)) {
-            return false;
-        }
-
-        /*for (Collidable collidable: allObjects) {
-            if (collidable.isInField(x, y)) {
-                return false;
-            }
-        }
-*/
-        return true;
-    }
-
     private void createWall(int relativeX, int relativeY) {
         int squareSize = environment.getSquareSize();
 
         int fieldX = (int) (hero.getX() / squareSize) + relativeX;
         int fieldY = (int) (hero.getY() / squareSize) + relativeY;
 
-        if (isAllowedCreateObjectThere(fieldX, fieldY)) {
+        if (gameActorField.isFreeToBuild(fieldX, fieldY)) {
             Wall wall = new Wall(textureManager.getTexture("wall"), fieldX, fieldY, squareSize);
             walls.add(wall);
             gameObjects.addActor(wall);
@@ -462,7 +448,7 @@ public class GameManager {
             iterations++;
             int x = MathUtils.random(environment.getSizeX());
             int y = MathUtils.random(environment.getSizeY());
-            if (isAllowedCreateObjectThere(x, y)) {
+            if (gameActorField.isFreeToBuild(x, y)) {
                 enemies.add(new Enemy(animation, x, y, environment.getSquareSize()));
                 enemyCount++;
             }
