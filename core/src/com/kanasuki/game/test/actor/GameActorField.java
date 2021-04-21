@@ -1,10 +1,15 @@
 package com.kanasuki.game.test.actor;
 
+import javax.inject.Inject;
+import javax.inject.Singleton;
+
+@Singleton
 public class GameActorField {
 
     private final GameActorManager gameActorManager;
     private final Environment environment;
 
+    @Inject
     public GameActorField(GameActorManager gameActorManager, Environment environment) {
         this.gameActorManager = gameActorManager;
         this.environment = environment;
@@ -38,5 +43,9 @@ public class GameActorField {
 
     public int getSquareSize() {
         return environment.getSquareSize();
+    }
+
+    public boolean isInside(int x, int y) {
+        return environment.isInEnvironment(x, y);
     }
 }

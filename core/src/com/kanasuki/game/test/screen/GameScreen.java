@@ -3,9 +3,7 @@ package com.kanasuki.game.test.screen;
 import com.badlogic.gdx.Gdx;
 import com.badlogic.gdx.InputMultiplexer;
 import com.badlogic.gdx.Screen;
-import com.badlogic.gdx.graphics.Camera;
 import com.badlogic.gdx.graphics.GL20;
-import com.badlogic.gdx.graphics.OrthographicCamera;
 import com.badlogic.gdx.scenes.scene2d.Actor;
 import com.badlogic.gdx.scenes.scene2d.Stage;
 import com.badlogic.gdx.utils.viewport.FillViewport;
@@ -40,8 +38,6 @@ public class GameScreen implements Screen {
 
     private final GuiFactory guiFactory;
 
-    private final Camera camera;
-
     private float oneSecond = 0;
     private int frames = 0;
 
@@ -51,23 +47,22 @@ public class GameScreen implements Screen {
         this.animationManager = animationManager;
         this.levelManager = levelManager;
         this.styleManager = styleManager;
-        this.camera = new OrthographicCamera();
         this.textureManager = textureManager;
         this.gameProgress = gameProgress;
         Gdx.app.log("debug", "created game screen");
 
         GameContext gameContext = DaggerGameContext.builder().gameModule(new GameModule(levelConfiguration, spaxContext)).build();
 
-        this.gameManager = gameContext.gameManager();//new GameManager(textureManager, animationManager, levelConfiguration, gameStatisticGui);
+        this.gameManager = gameContext.gameManager();
+
+        int squareSize = gameContext.environment().getSquareSize();
 
         this.uiStage = new Stage();
-        this.gameStage = new Stage(new FillViewport(1500, 1000, camera));
+        this.gameStage = new Stage(new FillViewport(1500, 1000));
+
+        gameStage.getCamera().position.set(levelConfiguration.getWidth()/2 * squareSize, levelConfiguration.getHeight()/2 * squareSize, 0);
 
         gameStage.addActor(gameManager.createGameGroup());
-
-        int squareSize = gameManager.getEnvironment().getSquareSize();
-
-        camera.position.set(levelConfiguration.getWidth()/2 * squareSize, levelConfiguration.getHeight()/2 * squareSize, 0);
 
         this.playerInputProcessor = new PlayerInputProcessor(gameManager);
         this.guiFactory = guiFactory;

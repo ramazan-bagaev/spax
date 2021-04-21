@@ -36,8 +36,6 @@ import java.util.Set;
 @Singleton
 public class GameManager {
 
-    private static int DEFAULT_SQUARE_SIZE = 50;
-
     private Environment environment;
     private Group gameObjects;
 
@@ -69,8 +67,6 @@ public class GameManager {
     private float timeWithoutInputProcessing = 0;
     private float timeWithoutAiTurn = 0;
 
-    private int squareSize;
-
     private int score;
 
     private final GameActorField gameActorField;
@@ -80,11 +76,14 @@ public class GameManager {
 
     @Inject
     public GameManager(TextureManager textureManager, AnimationManager animationManager,
-                       LevelConfiguration levelConfiguration, GameStatisticGui gameStatisticGui, Environment environment, GameActorManager gameActorManager) {
+                       LevelConfiguration levelConfiguration, GameStatisticGui gameStatisticGui, Environment environment,
+                       GameActorManager gameActorManager, WinningConditionChecker winningConditionChecker) {
         this.textureManager = textureManager;
         this.animationManager = animationManager;
         this.levelConfiguration = levelConfiguration;
         this.gameStatisticGui = gameStatisticGui;
+        this.winningConditionChecker = winningConditionChecker;
+        this.environment = environment;
         this.walls = new HashSet<>();
         this.enemies = new HashSet<>();
         this.deadEnemies = new HashSet<>();
@@ -126,25 +125,11 @@ public class GameManager {
         }
     }
 
-    public Environment getEnvironment() {
-        return environment;
-    }
-
-    public LevelConfiguration getLevelConfiguration() {
-        return levelConfiguration;
-    }
-
     public boolean isGameLost() {
         return gameLost;
     }
 
     public Group createGameGroup() {
-        this.squareSize = Math.min(Math.min(Gdx.graphics.getWidth()/levelConfiguration.getWidth(),
-                                   Gdx.graphics.getHeight()/levelConfiguration.getHeight()), DEFAULT_SQUARE_SIZE);
-
-        this.environment = new Environment(levelConfiguration.getWidth(), levelConfiguration.getHeight(), squareSize);
-        environment.setZIndex(0);
-
         Texture squareTexture = textureManager.getTexture("square");
         for (int i = 0; i < environment.getSizeX(); i++) {
             for (int j = 0; j < environment.getSizeY(); j++) {
@@ -152,8 +137,6 @@ public class GameManager {
                 environment.addActor(square);
             }
         }
-
-        this.winningConditionChecker = new WinningConditionChecker(this);
 
         this.hero = new Hero(animationManager.getAnimation(AnimationProfile.HERO), 4, 4, environment.getSquareSize());
         addEnemies(animationManager.getAnimation(AnimationProfile.ENEMY), levelConfiguration.getEnemyNumber());
@@ -319,6 +302,7 @@ public class GameManager {
             int fieldY = (int) (enemy.getY() / squareSize);
 
             int square = winningConditionChecker.checkEnemyConfinedSquare(fieldX, fieldY);
+            Gdx.app.log("debug", "winning condition: square = " + square);
 
             if (square <= levelConfiguration.getMaxEnemySquare()) {
                 iterator.remove();

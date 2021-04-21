@@ -32,6 +32,7 @@ public class AnimatedGameActor extends Actor implements GameActor {
         return ActorType.SOFT;
     }
 
+    @Override
     public boolean isInField(int x, int y) {
         int fieldX = (int) (getX() / squareSize);
         int fieldY = (int) (getY() / squareSize);

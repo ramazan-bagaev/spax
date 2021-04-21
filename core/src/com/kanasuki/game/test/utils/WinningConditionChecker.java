@@ -1,23 +1,24 @@
 package com.kanasuki.game.test.utils;
 
-import com.kanasuki.game.test.GameManager;
-import com.kanasuki.game.test.actor.Environment;
+import com.kanasuki.game.test.actor.GameActorField;
+import com.kanasuki.game.test.level.LevelConfiguration;
 
+import javax.inject.Inject;
+import javax.inject.Singleton;
 import java.util.Collection;
 import java.util.HashSet;
 import java.util.LinkedList;
 
+@Singleton
 public class WinningConditionChecker {
 
     private final int maxSquare;
+    private final GameActorField gameActorField;
 
-    private final GameManager gameManager;
-    private final Environment environment;
-
-    public WinningConditionChecker(GameManager gameManager) {
-        this.gameManager = gameManager;
-        this.environment = gameManager.getEnvironment();
-        this.maxSquare = gameManager.getLevelConfiguration().getMaxEnemySquare();
+    @Inject
+    public WinningConditionChecker(GameActorField gameActorField, LevelConfiguration levelConfiguration) {
+        this.gameActorField = gameActorField;
+        this.maxSquare = levelConfiguration.getMaxEnemySquare();
     }
 
     public int checkEnemyConfinedSquare(int x, int y) {
@@ -66,10 +67,8 @@ public class WinningConditionChecker {
     }
 
     private boolean couldAddToQueue(int x, int y) {
-        if (!environment.isInEnvironment(x, y)) {
-            return false;
-        }
+        boolean inside = gameActorField.isInside(x, y);
 
-        return !gameManager.isInWall(x, y);
+        return !gameActorField.isHard(x, y) && inside;
     }
 }
