@@ -13,6 +13,8 @@ import com.kanasuki.game.test.di.DaggerGameContext;
 import com.kanasuki.game.test.di.GameContext;
 import com.kanasuki.game.test.di.GameModule;
 import com.kanasuki.game.test.di.SpaxContext;
+import com.kanasuki.game.test.event.EventManager;
+import com.kanasuki.game.test.event.EventType;
 import com.kanasuki.game.test.gui.GameScreenLayout;
 import com.kanasuki.game.test.gui.GuiFactory;
 import com.kanasuki.game.test.input.PlayerInputProcessor;
@@ -35,6 +37,7 @@ public class GameScreen implements Screen {
     private final GameScreenLayout gameScreenLayout;
 
     private final GameProgress gameProgress;
+    private final EventManager eventManager;
 
     private final GuiFactory guiFactory;
 
@@ -43,12 +46,13 @@ public class GameScreen implements Screen {
 
     public GameScreen(SpaxContext spaxContext, TextureManager textureManager, AnimationManager animationManager,
                       LevelConfiguration levelConfiguration, GuiFactory guiFactory, GameProgress gameProgress,
-                      LevelManager levelManager, StyleManager styleManager) {
+                      LevelManager levelManager, StyleManager styleManager, EventManager eventManager) {
         this.animationManager = animationManager;
         this.levelManager = levelManager;
         this.styleManager = styleManager;
         this.textureManager = textureManager;
         this.gameProgress = gameProgress;
+        this.eventManager = eventManager;
         Gdx.app.log("debug", "created game screen");
 
         GameContext gameContext = DaggerGameContext.builder().gameModule(new GameModule(levelConfiguration, spaxContext)).build();
@@ -103,13 +107,9 @@ public class GameScreen implements Screen {
 
             if (gameManager.isGameWon()) {
                 gameProgress.recordScore(levelManager.getCurrentLevel(), gameManager.getScore());
+                eventManager.fire(EventType.NEXT_MAX_LEVEL);
 
                 Gdx.app.log("debug", "game won; current level = " + levelManager.getCurrentLevel() + "; current max level = " + levelManager.getCurrentMaxLevel());
-
-                if (levelManager.getCurrentLevel() == levelManager.getCurrentMaxLevel()) {
-                    levelManager.nextMaxLevel();
-                }
-
 
 
                 Actor actor = guiFactory.createWinWindow(styleManager.getSkin(),

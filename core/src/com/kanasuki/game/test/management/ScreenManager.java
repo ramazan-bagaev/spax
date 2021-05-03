@@ -59,7 +59,10 @@ public class ScreenManager implements EventListener {
     }
 
     public void nextMaxLevel() {
-        levelManager.nextMaxLevel();
+        if (levelManager.getCurrentLevel() == levelManager.getCurrentMaxLevel()) {
+            levelManager.nextMaxLevel();
+        }
+
         updateLevelScreen();
     }
 
@@ -133,6 +136,9 @@ public class ScreenManager implements EventListener {
             case NEXT_LEVEL:
                 nextLevel();
                 break;
+            case NEXT_MAX_LEVEL:
+                nextMaxLevel();
+                break;
             case CUSTOMIZABLE_GAME_ON:
                 setScreen(getGameScreen(levelManager.getCustomizableLevelConfiguration()));
                 break;
@@ -141,7 +147,6 @@ public class ScreenManager implements EventListener {
 
     private void nextLevel() {
         levelManager.nextLevel();
-        updateLevelScreen();
         setScreen(getGameScreen());
     }
 }

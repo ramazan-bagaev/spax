@@ -2,6 +2,7 @@ package com.kanasuki.game.test.screen;
 
 import com.kanasuki.game.test.GameProgress;
 import com.kanasuki.game.test.di.SpaxContext;
+import com.kanasuki.game.test.event.EventManager;
 import com.kanasuki.game.test.gui.GuiFactory;
 import com.kanasuki.game.test.level.LevelConfiguration;
 import com.kanasuki.game.test.management.LevelManager;
@@ -22,6 +23,7 @@ public class ScreenFactory {
     private final LevelManager levelManager;
     private final StyleManager styleManager;
     private final SpaxContext spaxContext;
+    private final EventManager eventManager;
 
     private MenuScreen menuScreen;
     private CustomizerScreen customizerScreen;
@@ -30,7 +32,7 @@ public class ScreenFactory {
     @Inject
     public ScreenFactory(TextureManager textureManager, AnimationManager animationManager,
                          GuiFactory guiFactory, GameProgress gameProgress,
-                         LevelManager levelManager, StyleManager styleManager, SpaxContext spaxContext) {
+                         LevelManager levelManager, StyleManager styleManager, SpaxContext spaxContext, EventManager eventManager) {
         this.textureManager = textureManager;
         this.animationManager = animationManager;
         this.guiFactory = guiFactory;
@@ -38,10 +40,11 @@ public class ScreenFactory {
         this.levelManager = levelManager;
         this.styleManager = styleManager;
         this.spaxContext = spaxContext;
+        this.eventManager = eventManager;
     }
 
     public GameScreen newGameScreen(LevelConfiguration levelConfiguration) {
-        return new GameScreen(spaxContext, textureManager, animationManager, levelConfiguration, guiFactory, gameProgress, levelManager, styleManager);
+        return new GameScreen(spaxContext, textureManager, animationManager, levelConfiguration, guiFactory, gameProgress, levelManager, styleManager, eventManager);
     }
 
     public LevelScreen newLevelScreen() {

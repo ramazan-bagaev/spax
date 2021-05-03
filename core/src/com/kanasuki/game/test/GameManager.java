@@ -42,10 +42,8 @@ public class GameManager {
     private Hero hero;
     private final Collection<Wall> walls;
     private final Collection<Enemy> enemies;
-    private final Collection<DeadEnemy> deadEnemies;
 
     private final Collection<GameActor> allObjects;
-    private final Collection<GameActor> obstructions;
 
     private final TextureManager textureManager;
 
@@ -86,11 +84,9 @@ public class GameManager {
         this.environment = environment;
         this.walls = new HashSet<>();
         this.enemies = new HashSet<>();
-        this.deadEnemies = new HashSet<>();
         this.movingCommands = new HashSet<>();
         this.actionCommands = new LinkedList<>();
         this.allObjects = new HashSet<>();
-        this.obstructions = new HashSet<>();
         this.gameLost = false;
         this.gameWon = false;
         this.score = 0;
@@ -161,8 +157,6 @@ public class GameManager {
         allObjects.addAll(walls);
         allObjects.addAll(enemies);
         allObjects.add(hero);
-
-        obstructions.addAll(walls);
 
         for (GameActor gameActor: allObjects) {
             gameActorManager.addGameActor(gameActor);
@@ -283,16 +277,6 @@ public class GameManager {
         return false;
     }
 
-    public boolean isInWall(int x, int y) {
-        for (Wall wall: walls) {
-            if (wall.isInField(x, y)) {
-                return true;
-            }
-        }
-
-        return false;
-    }
-
     private boolean checkWon() {
         for (Iterator<Enemy> iterator = enemies.iterator(); iterator.hasNext(); ) {
             Enemy enemy = iterator.next();
@@ -313,10 +297,8 @@ public class GameManager {
                 DeadEnemy deadEnemy = new DeadEnemy(textureManager.getTexture("dead-enemy"),
                         fieldX, fieldY, environment.getSquareSize());
 
-                deadEnemies.add(deadEnemy);
                 gameObjects.addActor(deadEnemy);
                 allObjects.add(deadEnemy);
-                obstructions.add(deadEnemy);
             }
         }
 
@@ -333,7 +315,8 @@ public class GameManager {
 
         switch (MathUtils.random(4)) {
             case 0:
-                if (isFree(fieldX, fieldY + 1) && !isInEnemy(fieldX, fieldY + 1)) {
+                //if (isFree(fieldX, fieldY + 1) && !isInEnemy(fieldX, fieldY + 1)) {
+                if (gameActorField.isFreeToMove(fieldX, fieldY + 1)) {
                     MoveByAction moveByAction = new MoveByAction();
                     moveByAction.setAmount(0, squareSize);
                     //moveByAction.setDuration(0.2f);
@@ -341,7 +324,8 @@ public class GameManager {
                 }
                 break;
             case 1:
-                if (isFree(fieldX, fieldY - 1) && !isInEnemy(fieldX, fieldY - 1)) {
+                //if (isFree(fieldX, fieldY - 1) && !isInEnemy(fieldX, fieldY - 1)) {
+                if (gameActorField.isFreeToMove(fieldX, fieldY - 1)) {
                     MoveByAction moveByAction = new MoveByAction();
                     moveByAction.setAmount(0, -squareSize);
                     //moveByAction.setDuration(0.2f);
@@ -349,7 +333,8 @@ public class GameManager {
                 }
                 break;
             case 2:
-                if (isFree(fieldX + 1, fieldY) && !isInEnemy(fieldX + 1, fieldY)) {
+                //if (isFree(fieldX + 1, fieldY) && !isInEnemy(fieldX + 1, fieldY)) {
+                if (gameActorField.isFreeToMove(fieldX + 1, fieldY)) {
                     MoveByAction moveByAction = new MoveByAction();
                     moveByAction.setAmount(squareSize, 0);
                     //moveByAction.setDuration(0.2f);
@@ -357,7 +342,8 @@ public class GameManager {
                 }
                 break;
             case 3:
-                if (isFree(fieldX - 1, fieldY) && !isInEnemy(fieldX - 1, fieldY)) {
+                //if (isFree(fieldX - 1, fieldY) && !isInEnemy(fieldX - 1, fieldY)) {
+                if (gameActorField.isFreeToMove(fieldX - 1, fieldY)) {
                     MoveByAction moveByAction = new MoveByAction();
                     moveByAction.setAmount(-squareSize, 0);
                     //moveByAction.setDuration(0.2f);
@@ -365,22 +351,6 @@ public class GameManager {
                 }
                 break;
         }
-    }
-
-    private boolean isFree(int x, int y) {
-        if (!environment.isInEnvironment(x, y)) {
-            return false;
-        }
-
-        return gameActorField.isFreeToMove(x, y);
-
-        /*for (Collidable collidable: obstructions) {
-            if (collidable.isInField(x, y)) {
-                return false;
-            }
-        }*/
-
-        //return true;
     }
 
     private void createWall(int relativeX, int relativeY) {
@@ -394,7 +364,6 @@ public class GameManager {
             walls.add(wall);
             gameObjects.addActor(wall);
             allObjects.add(wall);
-            obstructions.add(wall);
             gameActorManager.addGameActor(wall);
             if (checkWon()) {
                 this.gameWon = true;
@@ -418,7 +387,6 @@ public class GameManager {
                 iterator.remove();
                 gameObjects.removeActor(wall);
                 allObjects.remove(wall);
-                obstructions.remove(wall);
                 gameActorManager.removeGameActor(wall);
                 return;
             }
