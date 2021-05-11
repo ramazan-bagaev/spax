@@ -25,20 +25,22 @@ public class GameActorField {
         return gameActor == NullActor.instance;
     }
 
-    public boolean isFreeToMove(int x, int y) {
-        if (!environment.isInEnvironment(x, y)) {
+    public boolean isFreeToMove(int x, int y, ActorType movingActorType) {
+        if (!isInside(x, y)) {
             return false;
         }
 
         GameActor gameActor = gameActorManager.getGameActor(x, y);
 
-        return gameActor == NullActor.instance || gameActor.getType() == ActorType.SOFT;
+        return gameActor == NullActor.instance ||
+              (gameActor.getType() == ActorType.ENEMY && movingActorType == ActorType.HERO) ||
+              (gameActor.getType() == ActorType.HERO && movingActorType == ActorType.ENEMY);
     }
 
-    public boolean isHard(int x, int y) {
+    public boolean isObstruction(int x, int y) {
         GameActor gameActor = gameActorManager.getGameActor(x, y);
 
-        return gameActor != NullActor.instance && gameActor.getType() == ActorType.HARD;
+        return gameActor.getType() == ActorType.OBSTRUCTION;
     }
 
     public int getSquareSize() {

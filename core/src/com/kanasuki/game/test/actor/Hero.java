@@ -21,6 +21,11 @@ public class Hero extends AnimatedGameActor {
         }
     }
 
+    @Override
+    public ActorType getType() {
+        return ActorType.HERO;
+    }
+
     public void setCamera(Camera camera) {
         this.camera = camera;
         positionChanged();

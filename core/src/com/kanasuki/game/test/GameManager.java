@@ -8,15 +8,7 @@ import com.badlogic.gdx.math.MathUtils;
 import com.badlogic.gdx.scenes.scene2d.Actor;
 import com.badlogic.gdx.scenes.scene2d.Group;
 import com.badlogic.gdx.scenes.scene2d.actions.MoveByAction;
-import com.kanasuki.game.test.actor.DeadEnemy;
-import com.kanasuki.game.test.actor.Enemy;
-import com.kanasuki.game.test.actor.Environment;
-import com.kanasuki.game.test.actor.GameActor;
-import com.kanasuki.game.test.actor.GameActorField;
-import com.kanasuki.game.test.actor.GameActorManager;
-import com.kanasuki.game.test.actor.Hero;
-import com.kanasuki.game.test.actor.Square;
-import com.kanasuki.game.test.actor.Wall;
+import com.kanasuki.game.test.actor.*;
 import com.kanasuki.game.test.gui.GameStatisticGui;
 import com.kanasuki.game.test.input.PlayerInput;
 import com.kanasuki.game.test.level.LevelConfiguration;
@@ -244,7 +236,7 @@ public class GameManager {
         this.previousDeltaX = totalX;
         this.previousDeltaY = totalY;
 
-        if (gameActorField.isFreeToMove(fieldX, fieldY)) {
+        if (gameActorField.isFreeToMove(fieldX, fieldY, hero.getType())) {
             MoveByAction action = new MoveByAction();
             action.setAmount(totalX * squareSize, totalY * squareSize);
 
@@ -315,8 +307,7 @@ public class GameManager {
 
         switch (MathUtils.random(4)) {
             case 0:
-                //if (isFree(fieldX, fieldY + 1) && !isInEnemy(fieldX, fieldY + 1)) {
-                if (gameActorField.isFreeToMove(fieldX, fieldY + 1)) {
+                if (gameActorField.isFreeToMove(fieldX, fieldY + 1, ActorType.ENEMY)) {
                     MoveByAction moveByAction = new MoveByAction();
                     moveByAction.setAmount(0, squareSize);
                     //moveByAction.setDuration(0.2f);
@@ -324,8 +315,7 @@ public class GameManager {
                 }
                 break;
             case 1:
-                //if (isFree(fieldX, fieldY - 1) && !isInEnemy(fieldX, fieldY - 1)) {
-                if (gameActorField.isFreeToMove(fieldX, fieldY - 1)) {
+                if (gameActorField.isFreeToMove(fieldX, fieldY - 1, ActorType.ENEMY)) {
                     MoveByAction moveByAction = new MoveByAction();
                     moveByAction.setAmount(0, -squareSize);
                     //moveByAction.setDuration(0.2f);
@@ -333,8 +323,7 @@ public class GameManager {
                 }
                 break;
             case 2:
-                //if (isFree(fieldX + 1, fieldY) && !isInEnemy(fieldX + 1, fieldY)) {
-                if (gameActorField.isFreeToMove(fieldX + 1, fieldY)) {
+                if (gameActorField.isFreeToMove(fieldX + 1, fieldY, ActorType.ENEMY)) {
                     MoveByAction moveByAction = new MoveByAction();
                     moveByAction.setAmount(squareSize, 0);
                     //moveByAction.setDuration(0.2f);
@@ -342,8 +331,7 @@ public class GameManager {
                 }
                 break;
             case 3:
-                //if (isFree(fieldX - 1, fieldY) && !isInEnemy(fieldX - 1, fieldY)) {
-                if (gameActorField.isFreeToMove(fieldX - 1, fieldY)) {
+                if (gameActorField.isFreeToMove(fieldX - 1, fieldY, ActorType.ENEMY)) {
                     MoveByAction moveByAction = new MoveByAction();
                     moveByAction.setAmount(-squareSize, 0);
                     //moveByAction.setDuration(0.2f);

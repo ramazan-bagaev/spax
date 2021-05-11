@@ -2,5 +2,5 @@ package com.kanasuki.game.test.actor;
 
 public enum ActorType {
 
-    SOFT, HARD
+    HERO, ENEMY, OBSTRUCTION, VOID
 }

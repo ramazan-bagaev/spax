@@ -23,7 +23,7 @@ public class SpriteGameActor extends Actor implements GameActor {
 
     @Override
     public ActorType getType() {
-        return ActorType.SOFT;
+        return ActorType.VOID;
     }
 
     @Override

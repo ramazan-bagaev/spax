@@ -8,4 +8,9 @@ public class Enemy extends AnimatedGameActor {
     public Enemy(Animation<TextureAtlas.AtlasRegion> animation, int fieldX, int fieldY, int squareSize) {
         super(animation, fieldX, fieldY, squareSize);
     }
+
+    @Override
+    public ActorType getType() {
+        return ActorType.ENEMY;
+    }
 }

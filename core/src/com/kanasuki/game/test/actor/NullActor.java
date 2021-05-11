@@ -6,7 +6,7 @@ public class NullActor implements GameActor {
 
     @Override
     public ActorType getType() {
-        return null;
+        return ActorType.VOID;
     }
 
     @Override

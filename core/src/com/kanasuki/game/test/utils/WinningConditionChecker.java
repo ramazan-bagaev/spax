@@ -69,6 +69,6 @@ public class WinningConditionChecker {
     private boolean couldAddToQueue(int x, int y) {
         boolean inside = gameActorField.isInside(x, y);
 
-        return !gameActorField.isHard(x, y) && inside;
+        return !gameActorField.isObstruction(x, y) && inside;
     }
 }
