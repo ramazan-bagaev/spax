@@ -10,6 +10,6 @@ public class Wall extends SpriteGameActor {
 
     @Override
     public ActorType getType() {
-        return ActorType.OBSTRUCTION;
+        return ActorType.OBSTRUCTION_REMOVABLE;
     }
 }

@@ -40,7 +40,7 @@ public class GameActorField {
     public boolean isObstruction(int x, int y) {
         GameActor gameActor = gameActorManager.getGameActor(x, y);
 
-        return gameActor.getType() == ActorType.OBSTRUCTION;
+        return gameActor.getType() == ActorType.OBSTRUCTION_NON_REMOVABLE || gameActor.getType() == ActorType.OBSTRUCTION_REMOVABLE;
     }
 
     public int getSquareSize() {

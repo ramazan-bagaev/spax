@@ -5,13 +5,22 @@ import com.badlogic.gdx.graphics.Texture;
 import com.badlogic.gdx.graphics.g2d.Animation;
 import com.badlogic.gdx.graphics.g2d.TextureAtlas;
 import com.badlogic.gdx.math.MathUtils;
-import com.badlogic.gdx.scenes.scene2d.Actor;
 import com.badlogic.gdx.scenes.scene2d.Group;
 import com.badlogic.gdx.scenes.scene2d.actions.MoveByAction;
-import com.kanasuki.game.test.actor.*;
+import com.kanasuki.game.test.actor.ActorType;
+import com.kanasuki.game.test.actor.DeadEnemy;
+import com.kanasuki.game.test.actor.Enemy;
+import com.kanasuki.game.test.actor.Environment;
+import com.kanasuki.game.test.actor.GameActor;
+import com.kanasuki.game.test.actor.GameActorField;
+import com.kanasuki.game.test.actor.GameActorManager;
+import com.kanasuki.game.test.actor.Hero;
+import com.kanasuki.game.test.actor.Square;
+import com.kanasuki.game.test.actor.Wall;
 import com.kanasuki.game.test.gui.GameStatisticGui;
 import com.kanasuki.game.test.input.PlayerInput;
 import com.kanasuki.game.test.level.LevelConfiguration;
+import com.kanasuki.game.test.management.ActManager;
 import com.kanasuki.game.test.texture.AnimationManager;
 import com.kanasuki.game.test.texture.AnimationProfile;
 import com.kanasuki.game.test.texture.TextureManager;
@@ -29,13 +38,9 @@ import java.util.Set;
 public class GameManager {
 
     private Environment environment;
-    private Group gameObjects;
+    private final ActManager actManager;
 
     private Hero hero;
-    private final Collection<Wall> walls;
-    private final Collection<Enemy> enemies;
-
-    private final Collection<GameActor> allObjects;
 
     private final TextureManager textureManager;
 
@@ -67,18 +72,16 @@ public class GameManager {
     @Inject
     public GameManager(TextureManager textureManager, AnimationManager animationManager,
                        LevelConfiguration levelConfiguration, GameStatisticGui gameStatisticGui, Environment environment,
-                       GameActorManager gameActorManager, WinningConditionChecker winningConditionChecker) {
+                       GameActorManager gameActorManager, WinningConditionChecker winningConditionChecker, ActManager actManager) {
         this.textureManager = textureManager;
         this.animationManager = animationManager;
         this.levelConfiguration = levelConfiguration;
         this.gameStatisticGui = gameStatisticGui;
         this.winningConditionChecker = winningConditionChecker;
         this.environment = environment;
-        this.walls = new HashSet<>();
-        this.enemies = new HashSet<>();
+        this.actManager = actManager;
         this.movingCommands = new HashSet<>();
         this.actionCommands = new LinkedList<>();
-        this.allObjects = new HashSet<>();
         this.gameLost = false;
         this.gameWon = false;
         this.score = 0;
@@ -102,7 +105,7 @@ public class GameManager {
             }
 
             if (timeWithoutAiTurn > 0.4f) {
-                makeAiTurn();
+                actManager.actEnemies();
                 timeWithoutAiTurn = 0;
 
                 if (checkLost()) {
@@ -126,35 +129,14 @@ public class GameManager {
             }
         }
 
+        gameActorManager.getGameGroup().addActor(environment);
+
         this.hero = new Hero(animationManager.getAnimation(AnimationProfile.HERO), 4, 4, environment.getSquareSize());
         addEnemies(animationManager.getAnimation(AnimationProfile.ENEMY), levelConfiguration.getEnemyNumber());
 
-        this.gameObjects = new Group();
-        gameObjects.addActor(hero);
+        gameActorManager.addGameActor(hero);
 
-        for (Actor enemy: enemies) {
-            gameObjects.addActor(enemy);
-        }
-
-        for (Actor wall: walls) {
-            gameObjects.addActor(wall);
-        }
-
-        gameObjects.setZIndex(1);
-
-        Group gameGroup = new Group();
-        gameGroup.addActor(environment);
-        gameGroup.addActor(gameObjects);
-
-        allObjects.addAll(walls);
-        allObjects.addAll(enemies);
-        allObjects.add(hero);
-
-        for (GameActor gameActor: allObjects) {
-            gameActorManager.addGameActor(gameActor);
-        }
-
-        return gameGroup;
+        return gameActorManager.getGameGroup();
     }
 
     public void addMovingCommand(PlayerInput playerInput) {
@@ -244,101 +226,55 @@ public class GameManager {
         }
     }
 
-    public void makeAiTurn() {
-        for (Enemy enemy: enemies) {
-            makeAiTurn(enemy);
-        }
-    }
-
     public boolean checkLost() {
         int squareSize = environment.getSquareSize();
 
         int fieldX = (int) (hero.getX() / squareSize);
         int fieldY = (int) (hero.getY() / squareSize);
 
-        return isInEnemy(fieldX, fieldY);
-    }
-
-    public boolean isInEnemy(int x, int y) {
-        for (Enemy enemy: enemies) {
-            if (enemy.isInField(x, y)) {
-                return true;
-            }
-        }
-
-        return false;
+        return gameActorManager.isActorType(fieldX, fieldY, ActorType.ENEMY);
     }
 
     private boolean checkWon() {
-        for (Iterator<Enemy> iterator = enemies.iterator(); iterator.hasNext(); ) {
-            Enemy enemy = iterator.next();
+        Collection<GameActor> onDelete = new HashSet<>();
+
+        for (GameActor gameActor: gameActorManager.getGameActors()) {
+            if (gameActor.getType() != ActorType.ENEMY) {
+                continue;
+            }
+
             int squareSize = environment.getSquareSize();
 
-            int fieldX = (int) (enemy.getX() / squareSize);
-            int fieldY = (int) (enemy.getY() / squareSize);
+            int fieldX = (int) (gameActor.getX() / squareSize);
+            int fieldY = (int) (gameActor.getY() / squareSize);
 
             int square = winningConditionChecker.checkEnemyConfinedSquare(fieldX, fieldY);
             Gdx.app.log("debug", "winning condition: square = " + square);
 
             if (square <= levelConfiguration.getMaxEnemySquare()) {
-                iterator.remove();
-                gameObjects.removeActor(enemy);
+                onDelete.add(gameActor);
                 gameStatisticGui.increaseDeadEnemyCount();
                 this.score += levelConfiguration.getMaxEnemySquare() - square + 1;
                 gameStatisticGui.increaseScore(score);
-                DeadEnemy deadEnemy = new DeadEnemy(textureManager.getTexture("dead-enemy"),
-                        fieldX, fieldY, environment.getSquareSize());
-
-                gameObjects.addActor(deadEnemy);
-                allObjects.add(deadEnemy);
             }
         }
+        Gdx.app.log("debug", "to delete " + onDelete.size());
 
-        return enemies.isEmpty();
-    }
+        for (GameActor gameActor: onDelete) {
+            gameActorManager.removeGameActor(gameActor);
 
-    private void makeAiTurn(Actor actor) {
-        int squareSize = environment.getSquareSize();
-        float x = actor.getX();
-        float y = actor.getY();
+            int squareSize = environment.getSquareSize();
 
-        int fieldX = (int) (x / squareSize);
-        int fieldY = (int) (y / squareSize);
+            int fieldX = (int) (gameActor.getX() / squareSize);
+            int fieldY = (int) (gameActor.getY() / squareSize);
 
-        switch (MathUtils.random(4)) {
-            case 0:
-                if (gameActorField.isFreeToMove(fieldX, fieldY + 1, ActorType.ENEMY)) {
-                    MoveByAction moveByAction = new MoveByAction();
-                    moveByAction.setAmount(0, squareSize);
-                    //moveByAction.setDuration(0.2f);
-                    actor.addAction(moveByAction);
-                }
-                break;
-            case 1:
-                if (gameActorField.isFreeToMove(fieldX, fieldY - 1, ActorType.ENEMY)) {
-                    MoveByAction moveByAction = new MoveByAction();
-                    moveByAction.setAmount(0, -squareSize);
-                    //moveByAction.setDuration(0.2f);
-                    actor.addAction(moveByAction);
-                }
-                break;
-            case 2:
-                if (gameActorField.isFreeToMove(fieldX + 1, fieldY, ActorType.ENEMY)) {
-                    MoveByAction moveByAction = new MoveByAction();
-                    moveByAction.setAmount(squareSize, 0);
-                    //moveByAction.setDuration(0.2f);
-                    actor.addAction(moveByAction);
-                }
-                break;
-            case 3:
-                if (gameActorField.isFreeToMove(fieldX - 1, fieldY, ActorType.ENEMY)) {
-                    MoveByAction moveByAction = new MoveByAction();
-                    moveByAction.setAmount(-squareSize, 0);
-                    //moveByAction.setDuration(0.2f);
-                    actor.addAction(moveByAction);
-                }
-                break;
+            DeadEnemy deadEnemy = new DeadEnemy(textureManager.getTexture("dead-enemy"),
+                    fieldX, fieldY, environment.getSquareSize());
+
+            gameActorManager.addGameActor(deadEnemy);
         }
+
+        return gameActorManager.getEnemyAmount() == 0;
     }
 
     private void createWall(int relativeX, int relativeY) {
@@ -349,9 +285,6 @@ public class GameManager {
 
         if (gameActorField.isFreeToBuild(fieldX, fieldY)) {
             Wall wall = new Wall(textureManager.getTexture("wall"), fieldX, fieldY, squareSize);
-            walls.add(wall);
-            gameObjects.addActor(wall);
-            allObjects.add(wall);
             gameActorManager.addGameActor(wall);
             if (checkWon()) {
                 this.gameWon = true;
@@ -366,18 +299,10 @@ public class GameManager {
         int x = (int) (hero.getX() / squareSize) + previousDeltaX;
         int y = (int) (hero.getY() / squareSize) + previousDeltaY;
 
-        for (Iterator<Wall> iterator = walls.iterator(); iterator.hasNext(); ) {
-            Wall wall = iterator.next();
-            int fieldX = (int) (wall.getX() / squareSize);
-            int fieldY = (int) (wall.getY() / squareSize);
+        GameActor gameActor = gameActorManager.getGameActor(x, y);
 
-            if (fieldX == x && fieldY == y) {
-                iterator.remove();
-                gameObjects.removeActor(wall);
-                allObjects.remove(wall);
-                gameActorManager.removeGameActor(wall);
-                return;
-            }
+        if (gameActor.getType() == ActorType.OBSTRUCTION_REMOVABLE) {
+            gameActorManager.removeGameActor(gameActor);
         }
     }
 
@@ -389,7 +314,8 @@ public class GameManager {
             int x = MathUtils.random(environment.getSizeX());
             int y = MathUtils.random(environment.getSizeY());
             if (gameActorField.isFreeToBuild(x, y)) {
-                enemies.add(new Enemy(animation, x, y, environment.getSquareSize()));
+                Enemy enemy = new Enemy(animation, x, y, environment.getSquareSize());
+                gameActorManager.addGameActor(enemy);
                 enemyCount++;
             }
         }

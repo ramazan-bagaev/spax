@@ -1,10 +1,12 @@
 package com.kanasuki.game.test.actor;
 
-public interface GameActor {
+import com.badlogic.gdx.scenes.scene2d.Actor;
 
-    ActorType getType();
+public abstract class GameActor extends Actor {
 
-    boolean isInField(int x, int y);
+    public abstract ActorType getType();
 
-    void act(GameActorField gameActorField);
+    public abstract boolean isInField(int x, int y);
+
+    public abstract void act(GameActorField gameActorField);
 }

@@ -1,6 +1,6 @@
 package com.kanasuki.game.test.actor;
 
-public class NullActor implements GameActor {
+public class NullActor extends GameActor {
 
     public static final GameActor instance = new NullActor();
 

@@ -3,9 +3,8 @@ package com.kanasuki.game.test.actor;
 import com.badlogic.gdx.graphics.Texture;
 import com.badlogic.gdx.graphics.g2d.Batch;
 import com.badlogic.gdx.graphics.g2d.Sprite;
-import com.badlogic.gdx.scenes.scene2d.Actor;
 
-public class SpriteGameActor extends Actor implements GameActor {
+public class SpriteGameActor extends GameActor {
 
     private final int squareSize;
 

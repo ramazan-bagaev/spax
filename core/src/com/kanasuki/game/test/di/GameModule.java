@@ -2,8 +2,10 @@ package com.kanasuki.game.test.di;
 
 import com.kanasuki.game.test.GameManager;
 import com.kanasuki.game.test.actor.Environment;
+import com.kanasuki.game.test.actor.GameActorField;
 import com.kanasuki.game.test.actor.GameActorManager;
 import com.kanasuki.game.test.level.LevelConfiguration;
+import com.kanasuki.game.test.management.ActManager;
 import com.kanasuki.game.test.texture.AnimationManager;
 import com.kanasuki.game.test.texture.TextureManager;
 import com.kanasuki.game.test.utils.WinningConditionChecker;
@@ -44,8 +46,15 @@ public class GameModule {
     @Singleton
     @Provides
     public GameManager gameManager(TextureManager textureManager, AnimationManager animationManager, LevelConfiguration levelConfiguration,
-                                   Environment environment, GameActorManager gameActorManager, WinningConditionChecker winningConditionChecker) {
+                                   Environment environment, GameActorManager gameActorManager, WinningConditionChecker winningConditionChecker,
+                                   ActManager actManager) {
         return new GameManager(textureManager, animationManager, levelConfiguration, spaxContext.gameStatisticGui(),
-                environment, gameActorManager, winningConditionChecker);
+                environment, gameActorManager, winningConditionChecker, actManager);
+    }
+
+    @Singleton
+    @Provides
+    public ActManager actManager(GameActorManager gameActorManager, GameActorField gameActorField, Environment environment) {
+        return new ActManager(gameActorField, gameActorManager, environment);
     }
 }

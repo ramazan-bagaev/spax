@@ -10,6 +10,6 @@ public class DeadEnemy extends SpriteGameActor {
 
     @Override
     public ActorType getType() {
-        return ActorType.OBSTRUCTION;
+        return ActorType.OBSTRUCTION_NON_REMOVABLE;
     }
 }
