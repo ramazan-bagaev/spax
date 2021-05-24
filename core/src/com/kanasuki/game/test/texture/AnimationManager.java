@@ -26,7 +26,8 @@ public class AnimationManager {
 
         fileNames.put(AnimationProfile.HERO, "animation/hero/spritesheets/hero-sprite.atlas");
         fileNames.put(AnimationProfile.ENEMY, "animation/enemy/spritesheets/enemy-sprite.atlas");
-        fileNames.put(AnimationProfile.WALL_DESTRUCTION, "animation/destroying-wall/spritesheets/enemy-sprite.atlas");
+        fileNames.put(AnimationProfile.WALL_DESTRUCTION, "animation/destroying-wall/spritesheets/destroying-wall-sprite.atlas");
+        fileNames.put(AnimationProfile.DYING_ENEMY, "animation/dying-enemy/spritesheets/dying-enemy-sprite.atlas");
     }
 
     public void dispose() {

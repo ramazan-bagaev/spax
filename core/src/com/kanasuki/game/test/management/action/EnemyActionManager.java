@@ -1,33 +1,24 @@
-package com.kanasuki.game.test.management;
+package com.kanasuki.game.test.management.action;
 
 import com.badlogic.gdx.math.MathUtils;
 import com.badlogic.gdx.scenes.scene2d.actions.MoveByAction;
-import com.kanasuki.game.test.actor.*;
+import com.kanasuki.game.test.actor.ActorType;
+import com.kanasuki.game.test.actor.Environment;
+import com.kanasuki.game.test.actor.GameActor;
+import com.kanasuki.game.test.actor.GameActorField;
 
-import javax.inject.Singleton;
+public class EnemyActionManager implements GameActorActionManager {
 
-@Singleton
-public class ActManager {
-
-    private final GameActorField gameActorField;
-    private final GameActorManager gameActorManager;
     private final Environment environment;
+    private final GameActorField gameActorField;
 
-    public ActManager(GameActorField gameActorField, GameActorManager gameActorManager, Environment environment) {
-        this.gameActorField = gameActorField;
-        this.gameActorManager = gameActorManager;
+    public EnemyActionManager(Environment environment, GameActorField gameActorField) {
         this.environment = environment;
+        this.gameActorField = gameActorField;
     }
 
-    public void actEnemies() {
-        for (GameActor gameActor: gameActorManager.getGameActors()) {
-            if (gameActor.getType() == ActorType.ENEMY) {
-                actEnemy(gameActor);
-            }
-        }
-    }
-
-    private void actEnemy(GameActor actor) {
+    @Override
+    public void act(GameActor actor) {
         int squareSize = environment.getSquareSize();
         float x = actor.getX();
         float y = actor.getY();
@@ -69,5 +60,15 @@ public class ActManager {
                 }
                 break;
         }
+    }
+
+    @Override
+    public boolean isApplicable(GameActor gameActor) {
+        return gameActor.getType() == ActorType.ENEMY;
+    }
+
+    @Override
+    public float getActingPeriod() {
+        return 0.4f;
     }
 }

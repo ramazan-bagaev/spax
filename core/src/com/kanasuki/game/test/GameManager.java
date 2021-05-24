@@ -7,20 +7,11 @@ import com.badlogic.gdx.graphics.g2d.TextureAtlas;
 import com.badlogic.gdx.math.MathUtils;
 import com.badlogic.gdx.scenes.scene2d.Group;
 import com.badlogic.gdx.scenes.scene2d.actions.MoveByAction;
-import com.kanasuki.game.test.actor.ActorType;
-import com.kanasuki.game.test.actor.DeadEnemy;
-import com.kanasuki.game.test.actor.Enemy;
-import com.kanasuki.game.test.actor.Environment;
-import com.kanasuki.game.test.actor.GameActor;
-import com.kanasuki.game.test.actor.GameActorField;
-import com.kanasuki.game.test.actor.GameActorManager;
-import com.kanasuki.game.test.actor.Hero;
-import com.kanasuki.game.test.actor.Square;
-import com.kanasuki.game.test.actor.Wall;
+import com.kanasuki.game.test.actor.*;
 import com.kanasuki.game.test.gui.GameStatisticGui;
 import com.kanasuki.game.test.input.PlayerInput;
 import com.kanasuki.game.test.level.LevelConfiguration;
-import com.kanasuki.game.test.management.ActManager;
+import com.kanasuki.game.test.management.action.ActionManager;
 import com.kanasuki.game.test.texture.AnimationManager;
 import com.kanasuki.game.test.texture.AnimationProfile;
 import com.kanasuki.game.test.texture.TextureManager;
@@ -38,7 +29,7 @@ import java.util.Set;
 public class GameManager {
 
     private Environment environment;
-    private final ActManager actManager;
+    private final ActionManager actionManager;
 
     private Hero hero;
 
@@ -72,14 +63,14 @@ public class GameManager {
     @Inject
     public GameManager(TextureManager textureManager, AnimationManager animationManager,
                        LevelConfiguration levelConfiguration, GameStatisticGui gameStatisticGui, Environment environment,
-                       GameActorManager gameActorManager, WinningConditionChecker winningConditionChecker, ActManager actManager) {
+                       GameActorManager gameActorManager, WinningConditionChecker winningConditionChecker, ActionManager actionManager) {
         this.textureManager = textureManager;
         this.animationManager = animationManager;
         this.levelConfiguration = levelConfiguration;
         this.gameStatisticGui = gameStatisticGui;
         this.winningConditionChecker = winningConditionChecker;
         this.environment = environment;
-        this.actManager = actManager;
+        this.actionManager = actionManager;
         this.movingCommands = new HashSet<>();
         this.actionCommands = new LinkedList<>();
         this.gameLost = false;
@@ -104,8 +95,9 @@ public class GameManager {
                 }
             }
 
+            actionManager.act(delta);
+
             if (timeWithoutAiTurn > 0.4f) {
-                actManager.actEnemies();
                 timeWithoutAiTurn = 0;
 
                 if (checkLost()) {
@@ -268,10 +260,10 @@ public class GameManager {
             int fieldX = (int) (gameActor.getX() / squareSize);
             int fieldY = (int) (gameActor.getY() / squareSize);
 
-            DeadEnemy deadEnemy = new DeadEnemy(textureManager.getTexture("dead-enemy"),
+            DyingEnemy dyingEnemy = new DyingEnemy(animationManager.getAnimation(AnimationProfile.DYING_ENEMY),
                     fieldX, fieldY, environment.getSquareSize());
 
-            gameActorManager.addGameActor(deadEnemy);
+            gameActorManager.addGameActor(dyingEnemy);
         }
 
         return gameActorManager.getEnemyAmount() == 0;
@@ -302,6 +294,7 @@ public class GameManager {
         GameActor gameActor = gameActorManager.getGameActor(x, y);
 
         if (gameActor.getType() == ActorType.OBSTRUCTION_REMOVABLE) {
+            //gameActorManager.addGameActor(new DestroyingWall(animationManager.getAnimation(AnimationProfile.WALL_DESTRUCTION), x, y, squareSize));
             gameActorManager.removeGameActor(gameActor);
         }
     }
